@@ -80,17 +80,29 @@ export default async function handler(req, res) {
 
   <div style="max-width:620px;margin:auto;background:#ffffff;border:1px solid #d9d1cc;">
 
-    <div style="background:#2a0008;padding:30px;text-align:center;">
-      <img
-  src="https://cdn.shopify.com/s/files/1/0748/5014/0314/files/herbag_typo.svg?v=1778229865"
-  alt="Herbag"
-  style="max-width:220px;width:100%;height:auto;"
->
+   <div style="background:#2a0008;padding:40px;text-align:center;">
 
-      <p style="margin-top:10px;color:#d8c9c9;font-size:13px;letter-spacing:2px;">
-        NEW APPOINTMENT REQUEST
-      </p>
-    </div>
+  <img
+    src="https://cdn.shopify.com/s/files/1/0748/5014/0314/files/herbag_logo_white.png?v=1778686299"
+    alt="Herbag"
+    style="
+      width:120px;
+      height:auto;
+      display:block;
+      margin:0 auto 18px;
+    "
+  >
+
+  <p style="
+    margin:0;
+    color:#d8c9c9;
+    font-size:13px;
+    letter-spacing:4px;
+  ">
+    APPOINTMENT CONFIRMED
+  </p>
+
+</div>
 
     <div style="padding:40px;">
 
@@ -206,15 +218,29 @@ export default async function handler(req, res) {
 
   <div style="max-width:620px;margin:auto;background:#ffffff;border:1px solid #d9d1cc;">
 
-    <div style="background:#2a0008;padding:30px;text-align:center;">
-      <h1 style="margin:0;color:#ffffff;font-size:28px;letter-spacing:3px;font-weight:400;">
-        HERBAG
-      </h1>
+    <div style="background:#2a0008;padding:40px;text-align:center;">
 
-      <p style="margin-top:10px;color:#d8c9c9;font-size:13px;letter-spacing:2px;">
-        APPOINTMENT CONFIRMED
-      </p>
-    </div>
+  <img
+    src="https://cdn.shopify.com/s/files/1/0748/5014/0314/files/herbag_logo_white.png?v=1778686299"
+    alt="Herbag"
+    style="
+      width:120px;
+      height:auto;
+      display:block;
+      margin:0 auto 18px;
+    "
+  >
+
+  <p style="
+    margin:0;
+    color:#d8c9c9;
+    font-size:13px;
+    letter-spacing:4px;
+  ">
+    APPOINTMENT CONFIRMED
+  </p>
+
+</div>
 
     <div style="padding:40px;">
 
