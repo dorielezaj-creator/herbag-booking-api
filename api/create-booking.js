@@ -23,7 +23,8 @@ export default async function handler(req, res) {
   product,
   product_url,
   product_image,
-  product_description
+  product_description,
+  confirmation_code
 } = req.body;
 
     if (
