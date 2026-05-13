@@ -1,11 +1,11 @@
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-if (req.method === 'OPTIONS') {
-  return res.status(200).end();
-}
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -25,8 +25,17 @@ if (req.method === 'OPTIONS') {
       confirmation_code
     } = req.body;
 
-    if (!first_name || !last_name || !email || !phone || !selected_date || !selected_time) {
-      return res.status(400).json({ error: 'Missing required fields' });
+    if (
+      !first_name ||
+      !last_name ||
+      !email ||
+      !phone ||
+      !selected_date ||
+      !selected_time
+    ) {
+      return res.status(400).json({
+        error: 'Missing required fields'
+      });
     }
 
     const bookingData = {
@@ -58,11 +67,13 @@ if (req.method === 'OPTIONS') {
 
     if (!supabaseResponse.ok) {
       const errorText = await supabaseResponse.text();
-      return res.status(500).json({ error: errorText });
+
+      return res.status(500).json({
+        error: errorText
+      });
     }
 
-    
-const adminEmailHtml = `
+    const adminEmailHtml = `
 <div style="background:#f5f1ee;padding:40px;font-family:Arial,sans-serif;">
 
   <div style="max-width:620px;margin:auto;background:#ffffff;border:1px solid #d9d1cc;">
@@ -186,7 +197,7 @@ const adminEmailHtml = `
 </div>
 `;
 
-const clientEmailHtml = `
+    const clientEmailHtml = `
 <div style="background:#f5f1ee;padding:40px;font-family:Arial,sans-serif;">
 
   <div style="max-width:620px;margin:auto;background:#ffffff;border:1px solid #d9d1cc;">
@@ -287,25 +298,45 @@ const clientEmailHtml = `
 
 </div>
 `;
-```
 
+    const adminEmailResponse = await fetch(
+      'https://api.resend.com/emails',
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: 'Herbag <info@herbag.al>',
+          to: ['info@herbag.al'],
+          subject: `New Appointment Request - ${confirmation_code}`,
+          html: adminEmailHtml
+        })
+      }
+    );
 
-    const clientEmailResponse = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        from: 'Herbag <info@herbag.al>',
-        to: [email],
-        subject: `Your Herbag Appointment Confirmation - ${confirmation_code}`,
-        html: clientEmailHtml
-      })
-    });
+    const clientEmailResponse = await fetch(
+      'https://api.resend.com/emails',
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: 'Herbag <info@herbag.al>',
+          to: [email],
+          subject: `Your Herbag Appointment Confirmation - ${confirmation_code}`,
+          html: clientEmailHtml
+        })
+      }
+    );
 
     if (!adminEmailResponse.ok || !clientEmailResponse.ok) {
-      return res.status(500).json({ error: 'Booking saved, but email failed.' });
+      return res.status(500).json({
+        error: 'Booking saved, but email failed.'
+      });
     }
 
     return res.status(200).json({
