@@ -61,7 +61,7 @@ if (req.method === 'OPTIONS') {
       return res.status(500).json({ error: errorText });
     }
 
-    ```js
+    
 const adminEmailHtml = `
 <div style="background:#f5f1ee;padding:40px;font-family:Arial,sans-serif;">
 
