@@ -13,17 +13,18 @@ export default async function handler(req, res) {
 
   try {
     const {
-      first_name,
-      last_name,
-      email,
-      phone,
-      product,
-      product_url,
-      selected_date,
-      selected_time,
-      notes,
-      confirmation_code
-    } = req.body;
+  first_name,
+  last_name,
+  phone,
+  email,
+  notes,
+  selected_date,
+  selected_time,
+  product,
+  product_url,
+  product_image,
+  product_description
+} = req.body;
 
     if (
       !first_name ||
@@ -79,9 +80,11 @@ export default async function handler(req, res) {
   <div style="max-width:620px;margin:auto;background:#ffffff;border:1px solid #d9d1cc;">
 
     <div style="background:#2a0008;padding:30px;text-align:center;">
-      <h1 style="margin:0;color:#ffffff;font-size:28px;letter-spacing:3px;font-weight:400;">
-        HERBAG
-      </h1>
+      <img
+  src="https://cdn.shopify.com/s/files/1/0748/5014/0314/files/herbag_typo.svg?v=1778229865"
+  alt="Herbag"
+  style="max-width:220px;width:100%;height:auto;"
+>
 
       <p style="margin-top:10px;color:#d8c9c9;font-size:13px;letter-spacing:2px;">
         NEW APPOINTMENT REQUEST
@@ -257,6 +260,33 @@ export default async function handler(req, res) {
           </tr>
 
         </table>
+
+        <div style="margin-top:40px;text-align:center;">
+
+  <img
+    src="${product_image}"
+    alt="${product}"
+    style="
+      width:100%;
+      max-width:420px;
+      height:auto;
+      border:1px solid #e5e5e5;
+      display:block;
+      margin:0 auto 25px;
+    "
+  >
+
+  <p style="
+    font-size:14px;
+    line-height:1.8;
+    color:#666;
+    max-width:500px;
+    margin:0 auto;
+  ">
+    ${product_description}
+  </p>
+
+</div>
 
       </div>
 
