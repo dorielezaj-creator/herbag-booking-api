@@ -47,17 +47,20 @@ export default async function handler(req, res) {
     }
 
     const bookingData = {
-      first_name,
-      last_name,
-      email,
-      phone,
-      product,
-      product_url,
-      selected_date,
-      selected_time,
-      notes: notes || '',
-      confirmation_code
-    };
+  first_name,
+  last_name,
+  email,
+  phone,
+  product,
+  product_url,
+  product_image: product_image || '',
+  product_description: product_description || '',
+  selected_date,
+  selected_time,
+  notes: notes || '',
+  confirmation_code,
+  status: 'pending'
+};
 
     const supabaseResponse = await fetch(
       `${process.env.SUPABASE_URL}/rest/v1/bookings`,
@@ -67,7 +70,7 @@ export default async function handler(req, res) {
           apikey: process.env.SUPABASE_SERVICE_ROLE_KEY,
           Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
           'Content-Type': 'application/json',
-          Prefer: 'return=minimal'
+          Prefer: 'return=representation'
         },
         body: JSON.stringify(bookingData)
       }
