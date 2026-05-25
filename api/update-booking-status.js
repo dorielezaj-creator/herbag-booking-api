@@ -7,6 +7,15 @@ const escapeHtml = (value = '') =>
     "'": '&#039;'
   }[char]));
 
+function redirectToAdmin({ res, token, message }) {
+  const location =
+    `/api/admin-bookings?token=${encodeURIComponent(token)}` +
+    (message ? `&message=${encodeURIComponent(message)}` : '');
+
+  res.writeHead(302, { Location: location });
+  return res.end();
+}
+
 function buildStatusEmail({ booking, status }) {
   const isAccepted = status === 'accepted';
 
@@ -187,8 +196,18 @@ export default async function handler(req, res) {
   );
 
   if (!response.ok) {
+    const errorText = await response.text();
+
+    if (req.method === 'GET' && status === 'accepted' && errorText.includes('one_accepted_booking_per_slot')) {
+      return redirectToAdmin({
+        res,
+        token,
+        message: 'This time slot is already accepted for another booking. Please cancel the duplicate request or choose a different time.'
+      });
+    }
+
     return res.status(409).json({
-      error: await response.text()
+      error: errorText
     });
   }
 
@@ -200,10 +219,16 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'GET') {
-    res.writeHead(302, {
-      Location: `/api/admin-bookings?token=${encodeURIComponent(token)}`
+    return redirectToAdmin({
+      res,
+      token,
+      message:
+        status === 'accepted'
+          ? 'Appointment accepted and client email sent.'
+          : status === 'cancelled'
+            ? 'Appointment cancelled and client email sent.'
+            : ''
     });
-    return res.end();
   }
 
   return res.status(200).json({ success: true });
