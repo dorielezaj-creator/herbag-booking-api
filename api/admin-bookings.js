@@ -10,6 +10,7 @@ const escapeHtml = (value = '') =>
 export default async function handler(req, res) {
   const url = new URL(req.url, `https://${req.headers.host}`);
   const token = url.searchParams.get('token');
+  const message = url.searchParams.get('message');
 
   if (token !== process.env.ADMIN_TOKEN) {
     return res.status(401).send('Unauthorized');
@@ -58,24 +59,111 @@ export default async function handler(req, res) {
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Herbag Bookings</title>
+
         <style>
-          body{font-family:Arial,sans-serif;background:#f7f4f2;color:#2a0008;padding:30px;}
-          .wrap{max-width:900px;margin:auto;}
-          .card{background:#fff;border:1px solid #d8d0cc;padding:22px;margin-bottom:16px;}
-          .top{display:flex;justify-content:space-between;gap:12px;}
-          .status{padding:6px 10px;border:1px solid currentColor;text-transform:uppercase;font-size:12px;}
-          .accepted{color:green;}
-          .cancelled{color:#888;}
-          .pending{color:#7a0b1a;}
-          .actions{display:flex;gap:10px;margin-top:18px;}
-          .actions a{padding:12px 18px;text-decoration:none;color:#fff;}
-          .accept{background:#2a0008;}
-          .cancel{background:#777;}
+          body{
+            font-family:Arial,sans-serif;
+            background:#f7f4f2;
+            color:#2a0008;
+            padding:30px;
+          }
+
+          .wrap{
+            max-width:900px;
+            margin:auto;
+          }
+
+          h1{
+            margin:0 0 24px;
+          }
+
+          .notice{
+            background:#fff1f1;
+            border:1px solid #b00020;
+            color:#7a0018;
+            padding:14px 18px;
+            margin-bottom:18px;
+            line-height:1.5;
+          }
+
+          .card{
+            background:#fff;
+            border:1px solid #d8d0cc;
+            padding:22px;
+            margin-bottom:16px;
+          }
+
+          .top{
+            display:flex;
+            justify-content:space-between;
+            gap:12px;
+            align-items:flex-start;
+          }
+
+          .status{
+            padding:6px 10px;
+            border:1px solid currentColor;
+            text-transform:uppercase;
+            font-size:12px;
+            white-space:nowrap;
+          }
+
+          .accepted{
+            color:green;
+          }
+
+          .cancelled{
+            color:#888;
+          }
+
+          .pending{
+            color:#7a0b1a;
+          }
+
+          .actions{
+            display:flex;
+            gap:10px;
+            margin-top:18px;
+            flex-wrap:wrap;
+          }
+
+          .actions a{
+            padding:12px 18px;
+            text-decoration:none;
+            color:#fff;
+            display:inline-block;
+          }
+
+          .accept{
+            background:#2a0008;
+          }
+
+          .cancel{
+            background:#777;
+          }
+
+          @media(max-width:700px){
+            body{
+              padding:18px;
+            }
+
+            .top{
+              flex-direction:column;
+            }
+
+            .actions a{
+              width:100%;
+              box-sizing:border-box;
+              text-align:center;
+            }
+          }
         </style>
       </head>
+
       <body>
         <div class="wrap">
           <h1>Herbag Bookings</h1>
+          ${message ? `<div class="notice">${escapeHtml(message)}</div>` : ''}
           ${rows || '<p>No bookings yet.</p>'}
         </div>
       </body>
