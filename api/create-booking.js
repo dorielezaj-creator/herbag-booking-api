@@ -246,7 +246,7 @@ export default async function handler(req, res) {
     font-size:13px;
     letter-spacing:4px;
   ">
-    APPOINTMENT CONFIRMED
+ APPOINTMENT REQUEST RECEIVED
   </p>
 
 </div>
@@ -393,7 +393,7 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           from: 'Herbag <info@herbag.al>',
           to: [email],
-          subject: `Your Herbag Appointment Confirmation - ${confirmation_code}`,
+          subject: `Your Herbag Appointment Request - ${confirmation_code}`,
           html: clientEmailHtml
         })
       }
