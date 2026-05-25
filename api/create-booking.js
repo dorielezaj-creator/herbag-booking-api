@@ -108,7 +108,7 @@ export default async function handler(req, res) {
     font-size:13px;
     letter-spacing:4px;
   ">
-    APPOINTMENT CONFIRMED
+    APPOINTMENT REQUEST RECEIVED
   </p>
 
 </div>
