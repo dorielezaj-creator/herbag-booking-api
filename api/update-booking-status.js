@@ -14,10 +14,6 @@ function buildStatusEmail({ booking, status }) {
     ? 'APPOINTMENT CONFIRMED'
     : 'APPOINTMENT CANCELLED';
 
-  const heading = isAccepted
-    ? 'Your appointment is confirmed'
-    : 'Your appointment has been cancelled';
-
   const message = isAccepted
     ? 'We are pleased to confirm your appointment with Herbag.'
     : 'Your appointment request has been cancelled. If you would like to choose another time, please book a new appointment.';
@@ -76,6 +72,43 @@ function buildStatusEmail({ booking, status }) {
             </td>
           </tr>
         </table>
+
+        ${
+          booking.product_image
+            ? `
+        <div style="margin-top:40px;text-align:center;">
+          <img
+            src="${escapeHtml(booking.product_image)}"
+            alt="${escapeHtml(booking.product)}"
+            style="
+              width:100%;
+              max-width:420px;
+              height:auto;
+              border:1px solid #e5e5e5;
+              display:block;
+              margin:0 auto 25px;
+            "
+          >
+
+          ${
+            booking.product_description
+              ? `
+          <p style="
+            font-size:14px;
+            line-height:1.8;
+            color:#666;
+            max-width:500px;
+            margin:0 auto;
+          ">
+            ${escapeHtml(booking.product_description)}
+          </p>
+          `
+              : ''
+          }
+        </div>
+        `
+            : ''
+        }
       </div>
 
       <p style="margin-top:40px;color:#777;line-height:1.8;">
@@ -98,7 +131,7 @@ async function sendStatusEmail({ booking, status }) {
       ? `Your Herbag Appointment Is Confirmed - ${booking.confirmation_code}`
       : `Your Herbag Appointment Has Been Cancelled - ${booking.confirmation_code}`;
 
-  await fetch('https://api.resend.com/emails', {
+  const response = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
@@ -111,6 +144,10 @@ async function sendStatusEmail({ booking, status }) {
       html: buildStatusEmail({ booking, status })
     })
   });
+
+  if (!response.ok) {
+    throw new Error(await response.text());
+  }
 }
 
 export default async function handler(req, res) {
@@ -158,7 +195,7 @@ export default async function handler(req, res) {
   const updatedRows = await response.json();
   const booking = updatedRows[0];
 
-  if (booking) {
+  if (booking && ['accepted', 'cancelled'].includes(status)) {
     await sendStatusEmail({ booking, status });
   }
 
