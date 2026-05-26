@@ -1013,7 +1013,26 @@ export default async function handler(req, res) {
               scheduleToggle.innerText = 'Show schedule';
             }
           });
+function openScheduleDatePicker() {
+  scheduleDate.focus();
 
+  if (typeof scheduleDate.showPicker === 'function') {
+    try {
+      scheduleDate.showPicker();
+    } catch (error) {}
+  }
+}
+
+scheduleDate.addEventListener('click', openScheduleDatePicker);
+
+const scheduleDateBox = scheduleDate.closest('.schedule-date');
+
+if (scheduleDateBox) {
+  scheduleDateBox.addEventListener('click', function(event) {
+    if (event.target === scheduleDate) return;
+    openScheduleDatePicker();
+  });
+}
           scheduleDate.addEventListener('change', function() {
             currentSlotDate = '';
             currentSlotTime = '';
