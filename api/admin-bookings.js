@@ -43,16 +43,32 @@ export default async function handler(req, res) {
     const canCancel = booking.status !== 'cancelled';
 
     return `
-      <div class="card" data-status="${escapeHtml(booking.status)}">
-        <div class="top">
-          <strong>${escapeHtml(booking.first_name)} ${escapeHtml(booking.last_name)}</strong>
+      <article class="card" data-status="${escapeHtml(booking.status)}">
+        <div class="card-top">
+          <div>
+            <strong>${escapeHtml(booking.first_name)} ${escapeHtml(booking.last_name)}</strong>
+            <span class="muted">${escapeHtml(booking.email)} · ${escapeHtml(booking.phone)}</span>
+          </div>
+
           <span class="status ${escapeHtml(booking.status)}">${escapeHtml(booking.status)}</span>
         </div>
 
-        <p>${escapeHtml(booking.product)}</p>
-        <p>${escapeHtml(booking.selected_date)} · ${escapeHtml(booking.selected_time)}</p>
-        <p>${escapeHtml(booking.email)} · ${escapeHtml(booking.phone)}</p>
-        <p>Code: ${escapeHtml(booking.confirmation_code)}</p>
+        <div class="card-grid">
+          <div>
+            <span class="label">Product / Service</span>
+            <p>${escapeHtml(booking.product)}</p>
+          </div>
+
+          <div>
+            <span class="label">Date & Time</span>
+            <p>${escapeHtml(booking.selected_date)} · ${escapeHtml(booking.selected_time)}</p>
+          </div>
+
+          <div>
+            <span class="label">Confirmation Code</span>
+            <p>${escapeHtml(booking.confirmation_code)}</p>
+          </div>
+        </div>
 
         <div class="actions">
           ${
@@ -67,7 +83,7 @@ export default async function handler(req, res) {
               : ''
           }
         </div>
-      </div>
+      </article>
     `;
   }).join('');
 
@@ -84,50 +100,102 @@ export default async function handler(req, res) {
           *{box-sizing:border-box;}
 
           body{
-            font-family:Arial,sans-serif;
-            background:#f7f4f2;
-            color:#2a0008;
-            padding:30px;
             margin:0;
+            min-height:100vh;
+            font-family:Arial,sans-serif;
+            background:#f5f1ee;
+            color:#2a0008;
           }
 
-          .wrap{max-width:980px;margin:auto;}
+          .wrap{
+            width:min(1120px, calc(100% - 36px));
+            margin:0 auto;
+            padding:34px 0 56px;
+          }
+
+          .hero{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:24px;
+            margin-bottom:28px;
+            padding:22px;
+            background:#ffffff;
+            border:1px solid #ded5d0;
+          }
+
+          .brand{
+            display:flex;
+            align-items:center;
+            gap:18px;
+          }
+
+          .brand-mark{
+            width:64px;
+            height:64px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            background:#2a0008;
+          }
+
+          .brand-mark img{
+            width:38px;
+            height:auto;
+            display:block;
+          }
 
           h1{
-            margin:0 0 26px;
-            font-size:42px;
+            margin:0;
+            font-size:34px;
             line-height:1.1;
+            letter-spacing:.01em;
           }
 
-          .notice{
-            background:#fdebed;
-            border:1px solid #9b1c31;
-            color:#7a0b1a;
-            padding:18px 22px;
-            margin-bottom:24px;
+          .hero p{
+            margin:6px 0 0;
+            color:#7a7070;
+            font-size:15px;
+          }
+
+          .download-btn{
+            min-width:178px;
+            border:1px solid #2a0008;
+            background:#2a0008;
+            color:#fff;
+            padding:15px 18px;
+            cursor:pointer;
+            font:inherit;
             font-weight:700;
           }
 
-          .toolbar{
-            display:grid;
-            grid-template-columns:1fr auto;
-            gap:14px;
-            align-items:stretch;
-            margin-bottom:24px;
+          .download-btn:disabled{
+            background:#bdb7b9;
+            border-color:#bdb7b9;
+            cursor:not-allowed;
+          }
+
+          .notice{
+            background:#fff0f2;
+            border:1px solid #9b1c31;
+            color:#7a0b1a;
+            padding:16px 18px;
+            margin-bottom:18px;
+            font-weight:700;
           }
 
           .filters{
             display:grid;
             grid-template-columns:repeat(4, 1fr);
             gap:12px;
+            margin-bottom:24px;
           }
 
-          .filter-btn,
-          .download-btn{
-            border:1px solid currentColor;
-            background:#fff;
+          .filter-btn{
+            border:1px solid #ded5d0;
+            background:#ffffff;
             color:#2a0008;
-            padding:16px;
+            padding:18px;
             text-align:left;
             cursor:pointer;
             font:inherit;
@@ -136,96 +204,108 @@ export default async function handler(req, res) {
           .filter-btn strong{
             display:block;
             font-size:15px;
-            margin-bottom:8px;
+            margin-bottom:14px;
           }
 
           .filter-btn span{
-            display:inline-flex;
-            align-items:center;
-            justify-content:center;
-            min-width:34px;
-            height:30px;
-            border:1px solid currentColor;
+            font-size:28px;
             font-weight:700;
+            line-height:1;
           }
 
           .filter-btn.active{
             background:#2a0008;
-            color:#fff;
-          }
-
-          .download-btn{
-            min-width:180px;
-            background:#2a0008;
-            color:#fff;
-            text-align:center;
-            font-weight:700;
-          }
-
-          .download-btn:disabled{
-            background:#bdb7b9;
-            border-color:#bdb7b9;
-            color:#fff;
-            cursor:not-allowed;
+            border-color:#2a0008;
+            color:#ffffff;
           }
 
           .section-title{
             display:flex;
-            align-items:center;
+            align-items:flex-end;
             justify-content:space-between;
             gap:18px;
-            margin:0 0 14px;
-            padding-bottom:12px;
-            border-bottom:1px solid #d8d0cc;
+            margin:0 0 16px;
+            padding-bottom:14px;
+            border-bottom:1px solid #ded5d0;
           }
 
           .section-title h2{
             margin:0;
-            font-size:24px;
+            font-size:26px;
           }
 
           .section-title p{
             margin:5px 0 0;
-            color:#777;
+            color:#7a7070;
           }
 
           .card{
-            background:#fff;
-            border:1px solid #d8d0cc;
-            padding:22px;
-            margin-bottom:16px;
+            background:#ffffff;
+            border:1px solid #ded5d0;
+            padding:24px;
+            margin-bottom:14px;
           }
 
-          .card.hidden{display:none;}
+          .card.hidden{
+            display:none;
+          }
 
-          .top{
+          .card-top{
             display:flex;
             justify-content:space-between;
-            gap:12px;
             align-items:flex-start;
+            gap:16px;
+            margin-bottom:24px;
+          }
+
+          .card-top strong{
+            display:block;
+            font-size:19px;
+            margin-bottom:6px;
+          }
+
+          .muted{
+            color:#777;
+            font-size:14px;
+          }
+
+          .card-grid{
+            display:grid;
+            grid-template-columns:1.4fr 1fr 1fr;
+            gap:18px;
+          }
+
+          .label{
+            display:block;
+            margin-bottom:7px;
+            color:#8c8080;
+            font-size:11px;
+            letter-spacing:.14em;
+            text-transform:uppercase;
           }
 
           .card p{
-            margin:16px 0;
-            font-size:18px;
+            margin:0;
+            font-size:17px;
+            line-height:1.45;
           }
 
           .status{
-            padding:6px 10px;
+            padding:7px 10px;
             border:1px solid currentColor;
             text-transform:uppercase;
             font-size:12px;
             white-space:nowrap;
           }
 
-          .accepted{color:green;}
+          .accepted{color:#168019;}
           .cancelled{color:#777;}
-          .pending{color:#7a0b1a;}
+          .pending{color:#9b1c31;}
 
           .actions{
             display:flex;
             gap:10px;
-            margin-top:18px;
+            margin-top:24px;
           }
 
           .actions a{
@@ -235,7 +315,8 @@ export default async function handler(req, res) {
             display:inline-flex;
             align-items:center;
             justify-content:center;
-            min-width:92px;
+            min-width:96px;
+            font-weight:700;
           }
 
           .accept{background:#2a0008;}
@@ -243,32 +324,71 @@ export default async function handler(req, res) {
 
           .empty{
             display:none;
-            background:#fff;
-            border:1px dashed #d8d0cc;
+            background:#ffffff;
+            border:1px dashed #ded5d0;
             padding:24px;
             color:#777;
           }
 
-          .empty.active{display:block;}
+          .empty.active{
+            display:block;
+          }
 
-          @media(max-width:760px){
-            body{padding:18px;}
-
-            h1{font-size:32px;}
-
-            .toolbar{
-              grid-template-columns:1fr;
-            }
-
-            .filters{
-              grid-template-columns:1fr 1fr;
+          @media(max-width:860px){
+            .hero{
+              align-items:flex-start;
+              flex-direction:column;
             }
 
             .download-btn{
               width:100%;
             }
 
-            .top,
+            .filters{
+              grid-template-columns:1fr 1fr;
+            }
+
+            .card-grid{
+              grid-template-columns:1fr;
+            }
+          }
+
+          @media(max-width:560px){
+            .wrap{
+              width:calc(100% - 24px);
+              padding-top:18px;
+            }
+
+            .hero{
+              padding:18px;
+            }
+
+            .brand{
+              align-items:flex-start;
+            }
+
+            .brand-mark{
+              width:54px;
+              height:54px;
+            }
+
+            .brand-mark img{
+              width:32px;
+            }
+
+            h1{
+              font-size:28px;
+            }
+
+            .filters{
+              grid-template-columns:1fr;
+            }
+
+            .card{
+              padding:18px;
+            }
+
+            .card-top,
             .section-title{
               flex-direction:column;
               align-items:flex-start;
@@ -282,46 +402,49 @@ export default async function handler(req, res) {
               width:100%;
             }
           }
-
-          @media(max-width:480px){
-            .filters{
-              grid-template-columns:1fr;
-            }
-          }
         </style>
       </head>
 
       <body>
         <div class="wrap">
-          <h1>Herbag Bookings</h1>
+          <header class="hero">
+            <div class="brand">
+              <div class="brand-mark">
+                <img src="https://cdn.shopify.com/s/files/1/0748/5014/0314/files/herbag_logo_white.png?v=1778686299" alt="Herbag">
+              </div>
 
-          ${message ? `<div class="notice">${escapeHtml(message)}</div>` : ''}
-
-          <div class="toolbar">
-            <div class="filters">
-              <button type="button" class="filter-btn active" data-filter="all">
-                <strong>All</strong>
-                <span>${bookings.length}</span>
-              </button>
-
-              <button type="button" class="filter-btn" data-filter="pending">
-                <strong>Pending</strong>
-                <span>${pendingCount}</span>
-              </button>
-
-              <button type="button" class="filter-btn" data-filter="accepted">
-                <strong>Accepted</strong>
-                <span>${acceptedCount}</span>
-              </button>
-
-              <button type="button" class="filter-btn" data-filter="cancelled">
-                <strong>Cancelled</strong>
-                <span>${cancelledCount}</span>
-              </button>
+              <div>
+                <h1>Herbag Bookings</h1>
+                <p>Manage appointment requests, confirmations, and cancellations.</p>
+              </div>
             </div>
 
             <button type="button" class="download-btn" id="downloadExcel">
               Download Excel
+            </button>
+          </header>
+
+          ${message ? `<div class="notice">${escapeHtml(message)}</div>` : ''}
+
+          <div class="filters">
+            <button type="button" class="filter-btn active" data-filter="all">
+              <strong>All</strong>
+              <span>${bookings.length}</span>
+            </button>
+
+            <button type="button" class="filter-btn" data-filter="pending">
+              <strong>Pending</strong>
+              <span>${pendingCount}</span>
+            </button>
+
+            <button type="button" class="filter-btn" data-filter="accepted">
+              <strong>Accepted</strong>
+              <span>${acceptedCount}</span>
+            </button>
+
+            <button type="button" class="filter-btn" data-filter="cancelled">
+              <strong>Cancelled</strong>
+              <span>${cancelledCount}</span>
             </button>
           </div>
 
