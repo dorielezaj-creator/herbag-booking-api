@@ -32,16 +32,16 @@ export default async function handler(req, res) {
 
   const bookings = await response.json();
 
-  const pendingBookings = bookings.filter((booking) => booking.status === 'pending');
-  const acceptedBookings = bookings.filter((booking) => booking.status === 'accepted');
-  const cancelledBookings = bookings.filter((booking) => booking.status === 'cancelled');
+  const pendingCount = bookings.filter((booking) => booking.status === 'pending').length;
+  const acceptedCount = bookings.filter((booking) => booking.status === 'accepted').length;
+  const cancelledCount = bookings.filter((booking) => booking.status === 'cancelled').length;
 
-  function renderCard(booking) {
+  const rows = bookings.map((booking) => {
     const canAccept = booking.status !== 'accepted';
     const canCancel = booking.status !== 'cancelled';
 
     return `
-      <div class="card">
+      <div class="card" data-status="${escapeHtml(booking.status)}">
         <div class="top">
           <strong>${escapeHtml(booking.first_name)} ${escapeHtml(booking.last_name)}</strong>
           <span class="status ${escapeHtml(booking.status)}">${escapeHtml(booking.status)}</span>
@@ -67,28 +67,7 @@ export default async function handler(req, res) {
         </div>
       </div>
     `;
-  }
-
-  function renderSection(title, subtitle, items, className) {
-    return `
-      <section class="booking-section booking-section--${className}">
-        <div class="section-head">
-          <div>
-            <h2>${title}</h2>
-            <p>${subtitle}</p>
-          </div>
-
-          <span class="count">${items.length}</span>
-        </div>
-
-        ${
-          items.length
-            ? items.map(renderCard).join('')
-            : `<div class="empty">No bookings in this section.</div>`
-        }
-      </section>
-    `;
-  }
+  }).join('');
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
 
@@ -132,39 +111,62 @@ export default async function handler(req, res) {
             font-weight:700;
           }
 
-          .booking-section{
-            margin-bottom:34px;
+          .filters{
+            display:grid;
+            grid-template-columns:repeat(4, 1fr);
+            gap:12px;
+            margin-bottom:24px;
           }
 
-          .section-head{
+          .filter-btn{
+            border:1px solid currentColor;
+            background:#fff;
+            color:#2a0008;
+            padding:16px;
+            text-align:left;
+            cursor:pointer;
+            font:inherit;
+          }
+
+          .filter-btn strong{
+            display:block;
+            font-size:15px;
+            margin-bottom:8px;
+          }
+
+          .filter-btn span{
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            min-width:34px;
+            height:30px;
+            border:1px solid currentColor;
+            font-weight:700;
+          }
+
+          .filter-btn.active{
+            background:#2a0008;
+            color:#fff;
+          }
+
+          .section-title{
             display:flex;
             align-items:center;
             justify-content:space-between;
-            gap:20px;
-            margin-bottom:14px;
-            padding-bottom:10px;
+            gap:18px;
+            margin:0 0 14px;
+            padding-bottom:12px;
             border-bottom:1px solid #d8d0cc;
           }
 
-          .section-head h2{
+          .section-title h2{
             margin:0;
             font-size:24px;
           }
 
-          .section-head p{
-            margin:6px 0 0;
+          .section-title p{
+            margin:5px 0 0;
             color:#777;
-            font-size:14px;
-          }
-
-          .count{
-            min-width:42px;
-            height:42px;
-            border:1px solid currentColor;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            font-weight:700;
           }
 
           .card{
@@ -172,6 +174,10 @@ export default async function handler(req, res) {
             border:1px solid #d8d0cc;
             padding:22px;
             margin-bottom:16px;
+          }
+
+          .card.hidden{
+            display:none;
           }
 
           .top{
@@ -206,91 +212,4 @@ export default async function handler(req, res) {
             color:#7a0b1a;
           }
 
-          .actions{
-            display:flex;
-            gap:10px;
-            margin-top:18px;
-          }
-
-          .actions a{
-            padding:12px 18px;
-            text-decoration:none;
-            color:#fff;
-            display:inline-flex;
-            align-items:center;
-            justify-content:center;
-            min-width:92px;
-          }
-
-          .accept{
-            background:#2a0008;
-          }
-
-          .cancel{
-            background:#777;
-          }
-
-          .empty{
-            background:#fff;
-            border:1px dashed #d8d0cc;
-            padding:24px;
-            color:#777;
-          }
-
-          @media(max-width:700px){
-            body{
-              padding:18px;
-            }
-
-            h1{
-              font-size:32px;
-            }
-
-            .top,
-            .section-head{
-              flex-direction:column;
-              align-items:flex-start;
-            }
-
-            .actions{
-              flex-direction:column;
-            }
-
-            .actions a{
-              width:100%;
-            }
-          }
-        </style>
-      </head>
-
-      <body>
-        <div class="wrap">
-          <h1>Herbag Bookings</h1>
-
-          ${message ? `<div class="notice">${escapeHtml(message)}</div>` : ''}
-
-          ${renderSection(
-            'Pending approval',
-            'Appointments waiting for manager approval.',
-            pendingBookings,
-            'pending'
-          )}
-
-          ${renderSection(
-            'Accepted',
-            'Confirmed appointments.',
-            acceptedBookings,
-            'accepted'
-          )}
-
-          ${renderSection(
-            'Cancelled',
-            'Cancelled appointment requests.',
-            cancelledBookings,
-            'cancelled'
-          )}
-        </div>
-      </body>
-    </html>
-  `);
-}
+          .
