@@ -212,4 +212,176 @@ export default async function handler(req, res) {
             color:#7a0b1a;
           }
 
-          .
+          .actions{
+            display:flex;
+            gap:10px;
+            margin-top:18px;
+          }
+
+          .actions a{
+            padding:12px 18px;
+            text-decoration:none;
+            color:#fff;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            min-width:92px;
+          }
+
+          .accept{
+            background:#2a0008;
+          }
+
+          .cancel{
+            background:#777;
+          }
+
+          .empty{
+            display:none;
+            background:#fff;
+            border:1px dashed #d8d0cc;
+            padding:24px;
+            color:#777;
+          }
+
+          .empty.active{
+            display:block;
+          }
+
+          @media(max-width:760px){
+            body{
+              padding:18px;
+            }
+
+            h1{
+              font-size:32px;
+            }
+
+            .filters{
+              grid-template-columns:1fr 1fr;
+            }
+
+            .top,
+            .section-title{
+              flex-direction:column;
+              align-items:flex-start;
+            }
+
+            .actions{
+              flex-direction:column;
+            }
+
+            .actions a{
+              width:100%;
+            }
+          }
+
+          @media(max-width:480px){
+            .filters{
+              grid-template-columns:1fr;
+            }
+          }
+        </style>
+      </head>
+
+      <body>
+        <div class="wrap">
+          <h1>Herbag Bookings</h1>
+
+          ${message ? `<div class="notice">${escapeHtml(message)}</div>` : ''}
+
+          <div class="filters">
+            <button type="button" class="filter-btn active" data-filter="all">
+              <strong>All</strong>
+              <span>${bookings.length}</span>
+            </button>
+
+            <button type="button" class="filter-btn" data-filter="pending">
+              <strong>Pending</strong>
+              <span>${pendingCount}</span>
+            </button>
+
+            <button type="button" class="filter-btn" data-filter="accepted">
+              <strong>Accepted</strong>
+              <span>${acceptedCount}</span>
+            </button>
+
+            <button type="button" class="filter-btn" data-filter="cancelled">
+              <strong>Cancelled</strong>
+              <span>${cancelledCount}</span>
+            </button>
+          </div>
+
+          <div class="section-title">
+            <div>
+              <h2 id="currentTitle">All bookings</h2>
+              <p id="currentSubtitle">Showing all appointment requests.</p>
+            </div>
+          </div>
+
+          <div id="bookingList">
+            ${rows || ''}
+          </div>
+
+          <div class="empty" id="emptyState">
+            No bookings in this filter.
+          </div>
+        </div>
+
+        <script>
+          const buttons = document.querySelectorAll('.filter-btn');
+          const cards = document.querySelectorAll('.card');
+          const title = document.getElementById('currentTitle');
+          const subtitle = document.getElementById('currentSubtitle');
+          const emptyState = document.getElementById('emptyState');
+
+          const labels = {
+            all: {
+              title: 'All bookings',
+              subtitle: 'Showing all appointment requests.'
+            },
+            pending: {
+              title: 'Pending approval',
+              subtitle: 'Appointments waiting for manager approval.'
+            },
+            accepted: {
+              title: 'Accepted',
+              subtitle: 'Confirmed appointments.'
+            },
+            cancelled: {
+              title: 'Cancelled',
+              subtitle: 'Cancelled appointment requests.'
+            }
+          };
+
+          function applyFilter(filter) {
+            let visibleCount = 0;
+
+            cards.forEach(function(card) {
+              const shouldShow = filter === 'all' || card.dataset.status === filter;
+              card.classList.toggle('hidden', !shouldShow);
+
+              if (shouldShow) {
+                visibleCount += 1;
+              }
+            });
+
+            buttons.forEach(function(button) {
+              button.classList.toggle('active', button.dataset.filter === filter);
+            });
+
+            title.innerText = labels[filter].title;
+            subtitle.innerText = labels[filter].subtitle;
+            emptyState.classList.toggle('active', visibleCount === 0);
+          }
+
+          buttons.forEach(function(button) {
+            button.addEventListener('click', function() {
+              applyFilter(button.dataset.filter);
+            });
+          });
+        </script>
+      </body>
+    </html>
+  `);
+}
