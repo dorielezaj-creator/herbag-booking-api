@@ -154,7 +154,6 @@ export default async function handler(req, res) {
             margin:0;
             font-size:34px;
             line-height:1.1;
-            letter-spacing:.01em;
           }
 
           .hero p{
@@ -236,7 +235,6 @@ export default async function handler(req, res) {
             align-items:flex-end;
             justify-content:space-between;
             gap:18px;
-            margin-bottom:18px;
           }
 
           .schedule h2{
@@ -247,6 +245,12 @@ export default async function handler(req, res) {
           .schedule p{
             margin:5px 0 0;
             color:#7a7070;
+          }
+
+          .schedule-controls{
+            display:flex;
+            align-items:flex-end;
+            gap:12px;
           }
 
           .schedule-date{
@@ -269,6 +273,26 @@ export default async function handler(req, res) {
             color:#2a0008;
             padding:12px 14px;
             font:inherit;
+          }
+
+          .schedule-toggle{
+            border:1px solid #2a0008;
+            background:#2a0008;
+            color:#ffffff;
+            padding:13px 18px;
+            cursor:pointer;
+            font:inherit;
+            font-weight:700;
+            min-width:150px;
+          }
+
+          .schedule-body{
+            display:none;
+            margin-top:18px;
+          }
+
+          .schedule.open .schedule-body{
+            display:block;
           }
 
           .schedule-grid{
@@ -490,13 +514,15 @@ export default async function handler(req, res) {
 
           @media(max-width:760px){
             .hero,
-            .schedule-head{
+            .schedule-head,
+            .schedule-controls{
               align-items:flex-start;
               flex-direction:column;
             }
 
             .download-btn,
-            .schedule-date{
+            .schedule-date,
+            .schedule-toggle{
               width:100%;
             }
 
@@ -610,26 +636,34 @@ export default async function handler(req, res) {
             </button>
           </div>
 
-          <section class="schedule">
+          <section class="schedule" id="daySchedule">
             <div class="schedule-head">
               <div>
                 <h2>Day Schedule</h2>
                 <p>View booked and available times for a selected date.</p>
               </div>
 
-              <div class="schedule-date">
-                <label for="scheduleDate">Select Date</label>
-                <input type="date" id="scheduleDate">
+              <div class="schedule-controls">
+                <div class="schedule-date">
+                  <label for="scheduleDate">Select Date</label>
+                  <input type="date" id="scheduleDate">
+                </div>
+
+                <button type="button" class="schedule-toggle" id="scheduleToggle">
+                  Show schedule
+                </button>
               </div>
             </div>
 
-            <div class="schedule-grid" id="scheduleGrid"></div>
+            <div class="schedule-body">
+              <div class="schedule-grid" id="scheduleGrid"></div>
 
-            <div class="schedule-legend">
-              <span><i class="legend-dot available"></i>Available</span>
-              <span><i class="legend-dot pending"></i>Pending</span>
-              <span><i class="legend-dot accepted"></i>Accepted</span>
-              <span><i class="legend-dot cancelled"></i>Cancelled</span>
+              <div class="schedule-legend">
+                <span><i class="legend-dot available"></i>Available</span>
+                <span><i class="legend-dot pending"></i>Pending</span>
+                <span><i class="legend-dot accepted"></i>Accepted</span>
+                <span><i class="legend-dot cancelled"></i>Cancelled</span>
+              </div>
             </div>
           </section>
 
@@ -664,6 +698,8 @@ export default async function handler(req, res) {
           const scheduleDate = document.getElementById('scheduleDate');
           const scheduleGrid = document.getElementById('scheduleGrid');
           const clearSlotFilter = document.getElementById('clearSlotFilter');
+          const daySchedule = document.getElementById('daySchedule');
+          const scheduleToggle = document.getElementById('scheduleToggle');
 
           const times = [
             '10:30',
@@ -738,6 +774,16 @@ export default async function handler(req, res) {
             });
           }
 
+          function getBookingsForSlot(date, time, status) {
+            return bookingsData.filter(function(booking) {
+              const dateMatches = booking.selected_date === date;
+              const timeMatches = normalizeTime(booking.selected_time) === time;
+              const statusMatches = status === 'all' || booking.status === status;
+
+              return dateMatches && timeMatches && statusMatches;
+            });
+          }
+
           function getSlotInfo(date, time) {
             const matching = getBookingsForDate(date).filter(function(booking) {
               return normalizeTime(booking.selected_time) === time;
@@ -758,8 +804,9 @@ export default async function handler(req, res) {
             if (accepted.length) {
               return {
                 status: 'accepted',
-                label: accepted[0].first_name + ' ' + accepted[0].last_name,
-                count: accepted.length
+                label: accepted.length === 1
+                  ? accepted[0].first_name + ' ' + accepted[0].last_name
+                  : accepted.length + ' accepted bookings'
               };
             }
 
@@ -768,23 +815,22 @@ export default async function handler(req, res) {
                 status: 'pending',
                 label: pending.length === 1
                   ? pending[0].first_name + ' ' + pending[0].last_name
-                  : pending.length + ' pending requests',
-                count: pending.length
+                  : pending.length + ' pending requests'
               };
             }
 
             if (cancelled.length) {
               return {
                 status: 'cancelled',
-                label: cancelled.length + ' cancelled',
-                count: cancelled.length
+                label: cancelled.length === 1
+                  ? cancelled[0].first_name + ' ' + cancelled[0].last_name
+                  : cancelled.length + ' cancelled'
               };
             }
 
             return {
               status: 'available',
-              label: 'Available',
-              count: 0
+              label: 'Available'
             };
           }
 
@@ -794,7 +840,7 @@ export default async function handler(req, res) {
             scheduleGrid.innerHTML = times.map(function(time) {
               const info = getSlotInfo(date, time);
 
-              return '<button type="button" class="slot ' + info.status + '" data-time="' + time + '">' +
+              return '<button type="button" class="slot ' + info.status + '" data-time="' + time + '" data-status="' + info.status + '">' +
                 '<strong>' + time + '</strong>' +
                 '<span>' + info.label + '</span>' +
               '</button>';
@@ -802,6 +848,8 @@ export default async function handler(req, res) {
 
             scheduleGrid.querySelectorAll('.slot').forEach(function(slot) {
               slot.addEventListener('click', function() {
+                const slotStatus = slot.dataset.status;
+
                 currentSlotDate = scheduleDate.value;
                 currentSlotTime = slot.dataset.time;
 
@@ -812,7 +860,11 @@ export default async function handler(req, res) {
                 slot.classList.add('selected');
                 clearSlotFilter.classList.add('active');
 
-                applyFilter(currentFilter);
+                if (slotStatus === 'available') {
+                  applyFilter('all');
+                } else {
+                  applyFilter(slotStatus);
+                }
               });
             });
           }
@@ -937,8 +989,26 @@ export default async function handler(req, res) {
 
           buttons.forEach(function(button) {
             button.addEventListener('click', function() {
+              currentSlotDate = '';
+              currentSlotTime = '';
+              clearSlotFilter.classList.remove('active');
+
+              scheduleGrid.querySelectorAll('.slot').forEach(function(slot) {
+                slot.classList.remove('selected');
+              });
+
               applyFilter(button.dataset.filter);
             });
+          });
+
+          scheduleToggle.addEventListener('click', function() {
+            daySchedule.classList.toggle('open');
+
+            if (daySchedule.classList.contains('open')) {
+              scheduleToggle.innerText = 'Hide schedule';
+            } else {
+              scheduleToggle.innerText = 'Show schedule';
+            }
           });
 
           scheduleDate.addEventListener('change', function() {
