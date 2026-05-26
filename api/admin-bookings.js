@@ -36,6 +36,8 @@ export default async function handler(req, res) {
   const acceptedCount = bookings.filter((booking) => booking.status === 'accepted').length;
   const cancelledCount = bookings.filter((booking) => booking.status === 'cancelled').length;
 
+  const bookingsJson = JSON.stringify(bookings).replace(/</g, '\\u003c');
+
   const rows = bookings.map((booking) => {
     const canAccept = booking.status !== 'accepted';
     const canCancel = booking.status !== 'cancelled';
@@ -79,9 +81,7 @@ export default async function handler(req, res) {
         <title>Herbag Bookings</title>
 
         <style>
-          *{
-            box-sizing:border-box;
-          }
+          *{box-sizing:border-box;}
 
           body{
             font-family:Arial,sans-serif;
@@ -91,10 +91,7 @@ export default async function handler(req, res) {
             margin:0;
           }
 
-          .wrap{
-            max-width:980px;
-            margin:auto;
-          }
+          .wrap{max-width:980px;margin:auto;}
 
           h1{
             margin:0 0 26px;
@@ -111,14 +108,22 @@ export default async function handler(req, res) {
             font-weight:700;
           }
 
+          .toolbar{
+            display:grid;
+            grid-template-columns:1fr auto;
+            gap:14px;
+            align-items:stretch;
+            margin-bottom:24px;
+          }
+
           .filters{
             display:grid;
             grid-template-columns:repeat(4, 1fr);
             gap:12px;
-            margin-bottom:24px;
           }
 
-          .filter-btn{
+          .filter-btn,
+          .download-btn{
             border:1px solid currentColor;
             background:#fff;
             color:#2a0008;
@@ -149,6 +154,21 @@ export default async function handler(req, res) {
             color:#fff;
           }
 
+          .download-btn{
+            min-width:180px;
+            background:#2a0008;
+            color:#fff;
+            text-align:center;
+            font-weight:700;
+          }
+
+          .download-btn:disabled{
+            background:#bdb7b9;
+            border-color:#bdb7b9;
+            color:#fff;
+            cursor:not-allowed;
+          }
+
           .section-title{
             display:flex;
             align-items:center;
@@ -176,9 +196,7 @@ export default async function handler(req, res) {
             margin-bottom:16px;
           }
 
-          .card.hidden{
-            display:none;
-          }
+          .card.hidden{display:none;}
 
           .top{
             display:flex;
@@ -200,17 +218,9 @@ export default async function handler(req, res) {
             white-space:nowrap;
           }
 
-          .accepted{
-            color:green;
-          }
-
-          .cancelled{
-            color:#777;
-          }
-
-          .pending{
-            color:#7a0b1a;
-          }
+          .accepted{color:green;}
+          .cancelled{color:#777;}
+          .pending{color:#7a0b1a;}
 
           .actions{
             display:flex;
@@ -228,13 +238,8 @@ export default async function handler(req, res) {
             min-width:92px;
           }
 
-          .accept{
-            background:#2a0008;
-          }
-
-          .cancel{
-            background:#777;
-          }
+          .accept{background:#2a0008;}
+          .cancel{background:#777;}
 
           .empty{
             display:none;
@@ -244,21 +249,23 @@ export default async function handler(req, res) {
             color:#777;
           }
 
-          .empty.active{
-            display:block;
-          }
+          .empty.active{display:block;}
 
           @media(max-width:760px){
-            body{
-              padding:18px;
-            }
+            body{padding:18px;}
 
-            h1{
-              font-size:32px;
+            h1{font-size:32px;}
+
+            .toolbar{
+              grid-template-columns:1fr;
             }
 
             .filters{
               grid-template-columns:1fr 1fr;
+            }
+
+            .download-btn{
+              width:100%;
             }
 
             .top,
@@ -290,25 +297,31 @@ export default async function handler(req, res) {
 
           ${message ? `<div class="notice">${escapeHtml(message)}</div>` : ''}
 
-          <div class="filters">
-            <button type="button" class="filter-btn active" data-filter="all">
-              <strong>All</strong>
-              <span>${bookings.length}</span>
-            </button>
+          <div class="toolbar">
+            <div class="filters">
+              <button type="button" class="filter-btn active" data-filter="all">
+                <strong>All</strong>
+                <span>${bookings.length}</span>
+              </button>
 
-            <button type="button" class="filter-btn" data-filter="pending">
-              <strong>Pending</strong>
-              <span>${pendingCount}</span>
-            </button>
+              <button type="button" class="filter-btn" data-filter="pending">
+                <strong>Pending</strong>
+                <span>${pendingCount}</span>
+              </button>
 
-            <button type="button" class="filter-btn" data-filter="accepted">
-              <strong>Accepted</strong>
-              <span>${acceptedCount}</span>
-            </button>
+              <button type="button" class="filter-btn" data-filter="accepted">
+                <strong>Accepted</strong>
+                <span>${acceptedCount}</span>
+              </button>
 
-            <button type="button" class="filter-btn" data-filter="cancelled">
-              <strong>Cancelled</strong>
-              <span>${cancelledCount}</span>
+              <button type="button" class="filter-btn" data-filter="cancelled">
+                <strong>Cancelled</strong>
+                <span>${cancelledCount}</span>
+              </button>
+            </div>
+
+            <button type="button" class="download-btn" id="downloadExcel">
+              Download Excel
             </button>
           </div>
 
@@ -329,11 +342,15 @@ export default async function handler(req, res) {
         </div>
 
         <script>
+          const bookingsData = ${bookingsJson};
           const buttons = document.querySelectorAll('.filter-btn');
           const cards = document.querySelectorAll('.card');
           const title = document.getElementById('currentTitle');
           const subtitle = document.getElementById('currentSubtitle');
           const emptyState = document.getElementById('emptyState');
+          const downloadButton = document.getElementById('downloadExcel');
+
+          let currentFilter = 'all';
 
           const labels = {
             all: {
@@ -354,7 +371,18 @@ export default async function handler(req, res) {
             }
           };
 
+          function getFilteredBookings() {
+            if (currentFilter === 'all') {
+              return bookingsData;
+            }
+
+            return bookingsData.filter(function(booking) {
+              return booking.status === currentFilter;
+            });
+          }
+
           function applyFilter(filter) {
+            currentFilter = filter;
             let visibleCount = 0;
 
             cards.forEach(function(card) {
@@ -373,6 +401,75 @@ export default async function handler(req, res) {
             title.innerText = labels[filter].title;
             subtitle.innerText = labels[filter].subtitle;
             emptyState.classList.toggle('active', visibleCount === 0);
+            downloadButton.disabled = visibleCount === 0;
+          }
+
+          function cleanCsvValue(value) {
+            if (value === null || value === undefined) {
+              return '';
+            }
+
+            return String(value).replace(/\\r?\\n|\\r/g, ' ').trim();
+          }
+
+          function csvCell(value) {
+            return '"' + cleanCsvValue(value).replace(/"/g, '""') + '"';
+          }
+
+          function downloadSelectedBookings() {
+            const selectedBookings = getFilteredBookings();
+
+            if (!selectedBookings.length) {
+              return;
+            }
+
+            const headers = [
+              'Status',
+              'First Name',
+              'Last Name',
+              'Email',
+              'Phone',
+              'Date',
+              'Time',
+              'Product',
+              'Product URL',
+              'Notes',
+              'Confirmation Code',
+              'Created At'
+            ];
+
+            const lines = [
+              headers.map(csvCell).join(',')
+            ];
+
+            selectedBookings.forEach(function(booking) {
+              lines.push([
+                booking.status,
+                booking.first_name,
+                booking.last_name,
+                booking.email,
+                booking.phone,
+                booking.selected_date,
+                booking.selected_time,
+                booking.product,
+                booking.product_url,
+                booking.notes,
+                booking.confirmation_code,
+                booking.created_at
+              ].map(csvCell).join(','));
+            });
+
+            const csv = '\\ufeff' + lines.join('\\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const date = new Date().toISOString().slice(0, 10);
+
+            link.href = URL.createObjectURL(blob);
+            link.download = 'herbag-bookings-' + currentFilter + '-' + date + '.csv';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
           }
 
           buttons.forEach(function(button) {
@@ -380,6 +477,8 @@ export default async function handler(req, res) {
               applyFilter(button.dataset.filter);
             });
           });
+
+          downloadButton.addEventListener('click', downloadSelectedBookings);
         </script>
       </body>
     </html>
