@@ -43,7 +43,12 @@ export default async function handler(req, res) {
     const canCancel = booking.status !== 'cancelled';
 
     return `
-      <article class="card" data-status="${escapeHtml(booking.status)}">
+      <article
+        class="card"
+        data-status="${escapeHtml(booking.status)}"
+        data-date="${escapeHtml(booking.selected_date)}"
+        data-time="${escapeHtml(booking.selected_time)}"
+      >
         <div class="card-top">
           <div>
             <strong>${escapeHtml(booking.first_name)} ${escapeHtml(booking.last_name)}</strong>
@@ -118,7 +123,7 @@ export default async function handler(req, res) {
             align-items:center;
             justify-content:space-between;
             gap:24px;
-            margin-bottom:28px;
+            margin-bottom:22px;
             padding:22px;
             background:#ffffff;
             border:1px solid #ded5d0;
@@ -188,7 +193,7 @@ export default async function handler(req, res) {
             display:grid;
             grid-template-columns:repeat(4, 1fr);
             gap:12px;
-            margin-bottom:24px;
+            margin-bottom:18px;
           }
 
           .filter-btn{
@@ -219,6 +224,135 @@ export default async function handler(req, res) {
             color:#ffffff;
           }
 
+          .schedule{
+            background:#ffffff;
+            border:1px solid #ded5d0;
+            padding:22px;
+            margin-bottom:24px;
+          }
+
+          .schedule-head{
+            display:flex;
+            align-items:flex-end;
+            justify-content:space-between;
+            gap:18px;
+            margin-bottom:18px;
+          }
+
+          .schedule h2{
+            margin:0;
+            font-size:24px;
+          }
+
+          .schedule p{
+            margin:5px 0 0;
+            color:#7a7070;
+          }
+
+          .schedule-date{
+            min-width:220px;
+          }
+
+          .schedule-date label{
+            display:block;
+            margin-bottom:7px;
+            color:#8c8080;
+            font-size:11px;
+            letter-spacing:.14em;
+            text-transform:uppercase;
+          }
+
+          .schedule-date input{
+            width:100%;
+            border:1px solid #2a0008;
+            background:#fff;
+            color:#2a0008;
+            padding:12px 14px;
+            font:inherit;
+          }
+
+          .schedule-grid{
+            display:grid;
+            grid-template-columns:repeat(4, 1fr);
+            gap:10px;
+          }
+
+          .slot{
+            border:1px solid #ded5d0;
+            background:#fff;
+            color:#2a0008;
+            min-height:88px;
+            padding:13px;
+            text-align:left;
+            cursor:pointer;
+            font:inherit;
+          }
+
+          .slot strong{
+            display:block;
+            font-size:17px;
+            margin-bottom:8px;
+          }
+
+          .slot span{
+            display:block;
+            color:#777;
+            font-size:13px;
+            line-height:1.35;
+          }
+
+          .slot.available{
+            background:#fff;
+          }
+
+          .slot.pending{
+            background:#fff7e5;
+            border-color:#c8942f;
+          }
+
+          .slot.accepted{
+            background:#2a0008;
+            border-color:#2a0008;
+            color:#fff;
+          }
+
+          .slot.accepted span{
+            color:#eadede;
+          }
+
+          .slot.cancelled{
+            background:#f1f1f1;
+            color:#777;
+          }
+
+          .slot.selected{
+            outline:3px solid #7a0b1a;
+            outline-offset:2px;
+          }
+
+          .schedule-legend{
+            display:flex;
+            flex-wrap:wrap;
+            gap:10px 18px;
+            margin-top:16px;
+            color:#777;
+            font-size:13px;
+          }
+
+          .legend-dot{
+            width:11px;
+            height:11px;
+            display:inline-block;
+            margin-right:7px;
+            border:1px solid #ded5d0;
+            vertical-align:middle;
+          }
+
+          .legend-dot.available{background:#fff;}
+          .legend-dot.pending{background:#fff7e5;border-color:#c8942f;}
+          .legend-dot.accepted{background:#2a0008;border-color:#2a0008;}
+          .legend-dot.cancelled{background:#f1f1f1;}
+
           .section-title{
             display:flex;
             align-items:flex-end;
@@ -237,6 +371,20 @@ export default async function handler(req, res) {
           .section-title p{
             margin:5px 0 0;
             color:#7a7070;
+          }
+
+          .clear-slot-filter{
+            display:none;
+            border:1px solid #2a0008;
+            background:#fff;
+            color:#2a0008;
+            padding:10px 14px;
+            cursor:pointer;
+            font:inherit;
+          }
+
+          .clear-slot-filter.active{
+            display:inline-flex;
           }
 
           .card{
@@ -334,17 +482,29 @@ export default async function handler(req, res) {
             display:block;
           }
 
-          @media(max-width:860px){
-            .hero{
+          @media(max-width:900px){
+            .schedule-grid{
+              grid-template-columns:repeat(3, 1fr);
+            }
+          }
+
+          @media(max-width:760px){
+            .hero,
+            .schedule-head{
               align-items:flex-start;
               flex-direction:column;
             }
 
-            .download-btn{
+            .download-btn,
+            .schedule-date{
               width:100%;
             }
 
             .filters{
+              grid-template-columns:1fr 1fr;
+            }
+
+            .schedule-grid{
               grid-template-columns:1fr 1fr;
             }
 
@@ -359,7 +519,8 @@ export default async function handler(req, res) {
               padding-top:18px;
             }
 
-            .hero{
+            .hero,
+            .schedule{
               padding:18px;
             }
 
@@ -380,7 +541,8 @@ export default async function handler(req, res) {
               font-size:28px;
             }
 
-            .filters{
+            .filters,
+            .schedule-grid{
               grid-template-columns:1fr;
             }
 
@@ -448,11 +610,38 @@ export default async function handler(req, res) {
             </button>
           </div>
 
+          <section class="schedule">
+            <div class="schedule-head">
+              <div>
+                <h2>Day Schedule</h2>
+                <p>View booked and available times for a selected date.</p>
+              </div>
+
+              <div class="schedule-date">
+                <label for="scheduleDate">Select Date</label>
+                <input type="date" id="scheduleDate">
+              </div>
+            </div>
+
+            <div class="schedule-grid" id="scheduleGrid"></div>
+
+            <div class="schedule-legend">
+              <span><i class="legend-dot available"></i>Available</span>
+              <span><i class="legend-dot pending"></i>Pending</span>
+              <span><i class="legend-dot accepted"></i>Accepted</span>
+              <span><i class="legend-dot cancelled"></i>Cancelled</span>
+            </div>
+          </section>
+
           <div class="section-title">
             <div>
               <h2 id="currentTitle">All bookings</h2>
               <p id="currentSubtitle">Showing all appointment requests.</p>
             </div>
+
+            <button type="button" class="clear-slot-filter" id="clearSlotFilter">
+              Clear time filter
+            </button>
           </div>
 
           <div id="bookingList">
@@ -472,8 +661,27 @@ export default async function handler(req, res) {
           const subtitle = document.getElementById('currentSubtitle');
           const emptyState = document.getElementById('emptyState');
           const downloadButton = document.getElementById('downloadExcel');
+          const scheduleDate = document.getElementById('scheduleDate');
+          const scheduleGrid = document.getElementById('scheduleGrid');
+          const clearSlotFilter = document.getElementById('clearSlotFilter');
+
+          const times = [
+            '10:30',
+            '11:15',
+            '12:00',
+            '12:45',
+            '13:30',
+            '14:15',
+            '15:00',
+            '15:45',
+            '16:30',
+            '17:15',
+            '18:00'
+          ];
 
           let currentFilter = 'all';
+          let currentSlotDate = '';
+          let currentSlotTime = '';
 
           const labels = {
             all: {
@@ -494,13 +702,130 @@ export default async function handler(req, res) {
             }
           };
 
-          function getFilteredBookings() {
-            if (currentFilter === 'all') {
-              return bookingsData;
+          function normalizeTime(value) {
+            const time = String(value || '').trim();
+            const match = time.match(/(\\d{1,2}):(\\d{2})\\s*(AM|PM)?/i);
+
+            if (!match) {
+              return time;
             }
 
+            let hour = Number(match[1]);
+            const minute = match[2];
+            const meridiem = match[3] ? match[3].toUpperCase() : '';
+
+            if (meridiem === 'PM' && hour < 12) {
+              hour += 12;
+            }
+
+            if (meridiem === 'AM' && hour === 12) {
+              hour = 0;
+            }
+
+            return String(hour).padStart(2, '0') + ':' + minute;
+          }
+
+          function todayIso() {
+            const today = new Date();
+            const offset = today.getTimezoneOffset();
+            const local = new Date(today.getTime() - offset * 60000);
+            return local.toISOString().slice(0, 10);
+          }
+
+          function getBookingsForDate(date) {
             return bookingsData.filter(function(booking) {
-              return booking.status === currentFilter;
+              return booking.selected_date === date;
+            });
+          }
+
+          function getSlotInfo(date, time) {
+            const matching = getBookingsForDate(date).filter(function(booking) {
+              return normalizeTime(booking.selected_time) === time;
+            });
+
+            const accepted = matching.filter(function(booking) {
+              return booking.status === 'accepted';
+            });
+
+            const pending = matching.filter(function(booking) {
+              return booking.status === 'pending';
+            });
+
+            const cancelled = matching.filter(function(booking) {
+              return booking.status === 'cancelled';
+            });
+
+            if (accepted.length) {
+              return {
+                status: 'accepted',
+                label: accepted[0].first_name + ' ' + accepted[0].last_name,
+                count: accepted.length
+              };
+            }
+
+            if (pending.length) {
+              return {
+                status: 'pending',
+                label: pending.length === 1
+                  ? pending[0].first_name + ' ' + pending[0].last_name
+                  : pending.length + ' pending requests',
+                count: pending.length
+              };
+            }
+
+            if (cancelled.length) {
+              return {
+                status: 'cancelled',
+                label: cancelled.length + ' cancelled',
+                count: cancelled.length
+              };
+            }
+
+            return {
+              status: 'available',
+              label: 'Available',
+              count: 0
+            };
+          }
+
+          function renderSchedule() {
+            const date = scheduleDate.value;
+
+            scheduleGrid.innerHTML = times.map(function(time) {
+              const info = getSlotInfo(date, time);
+
+              return '<button type="button" class="slot ' + info.status + '" data-time="' + time + '">' +
+                '<strong>' + time + '</strong>' +
+                '<span>' + info.label + '</span>' +
+              '</button>';
+            }).join('');
+
+            scheduleGrid.querySelectorAll('.slot').forEach(function(slot) {
+              slot.addEventListener('click', function() {
+                currentSlotDate = scheduleDate.value;
+                currentSlotTime = slot.dataset.time;
+
+                scheduleGrid.querySelectorAll('.slot').forEach(function(item) {
+                  item.classList.remove('selected');
+                });
+
+                slot.classList.add('selected');
+                clearSlotFilter.classList.add('active');
+
+                applyFilter(currentFilter);
+              });
+            });
+          }
+
+          function getFilteredBookings() {
+            return bookingsData.filter(function(booking) {
+              const statusMatches = currentFilter === 'all' || booking.status === currentFilter;
+              const slotMatches = !currentSlotDate || (
+                booking.selected_date === currentSlotDate &&
+                normalizeTime(booking.selected_time) === currentSlotTime
+              );
+
+              return statusMatches && slotMatches;
             });
           }
 
@@ -509,7 +834,13 @@ export default async function handler(req, res) {
             let visibleCount = 0;
 
             cards.forEach(function(card) {
-              const shouldShow = filter === 'all' || card.dataset.status === filter;
+              const statusMatches = filter === 'all' || card.dataset.status === filter;
+              const slotMatches = !currentSlotDate || (
+                card.dataset.date === currentSlotDate &&
+                normalizeTime(card.dataset.time) === currentSlotTime
+              );
+
+              const shouldShow = statusMatches && slotMatches;
               card.classList.toggle('hidden', !shouldShow);
 
               if (shouldShow) {
@@ -522,7 +853,13 @@ export default async function handler(req, res) {
             });
 
             title.innerText = labels[filter].title;
-            subtitle.innerText = labels[filter].subtitle;
+
+            if (currentSlotDate && currentSlotTime) {
+              subtitle.innerText = 'Showing ' + labels[filter].title.toLowerCase() + ' for ' + currentSlotDate + ' at ' + currentSlotTime + '.';
+            } else {
+              subtitle.innerText = labels[filter].subtitle;
+            }
+
             emptyState.classList.toggle('active', visibleCount === 0);
             downloadButton.disabled = visibleCount === 0;
           }
@@ -586,9 +923,12 @@ export default async function handler(req, res) {
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             const date = new Date().toISOString().slice(0, 10);
+            const slotSuffix = currentSlotDate && currentSlotTime
+              ? '-' + currentSlotDate + '-' + currentSlotTime.replace(':', '-')
+              : '';
 
             link.href = URL.createObjectURL(blob);
-            link.download = 'herbag-bookings-' + currentFilter + '-' + date + '.csv';
+            link.download = 'herbag-bookings-' + currentFilter + slotSuffix + '-' + date + '.csv';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -601,7 +941,31 @@ export default async function handler(req, res) {
             });
           });
 
+          scheduleDate.addEventListener('change', function() {
+            currentSlotDate = '';
+            currentSlotTime = '';
+            clearSlotFilter.classList.remove('active');
+            renderSchedule();
+            applyFilter(currentFilter);
+          });
+
+          clearSlotFilter.addEventListener('click', function() {
+            currentSlotDate = '';
+            currentSlotTime = '';
+            clearSlotFilter.classList.remove('active');
+
+            scheduleGrid.querySelectorAll('.slot').forEach(function(slot) {
+              slot.classList.remove('selected');
+            });
+
+            applyFilter(currentFilter);
+          });
+
           downloadButton.addEventListener('click', downloadSelectedBookings);
+
+          scheduleDate.value = todayIso();
+          renderSchedule();
+          applyFilter('all');
         </script>
       </body>
     </html>
