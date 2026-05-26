@@ -567,10 +567,13 @@ export default async function handler(req, res) {
               font-size:28px;
             }
 
-            .filters,
-            .schedule-grid{
-              grid-template-columns:1fr;
-            }
+           .filters{
+  grid-template-columns:1fr 1fr;
+}
+
+.schedule-grid{
+  grid-template-columns:1fr;
+}
 
             .card{
               padding:18px;
