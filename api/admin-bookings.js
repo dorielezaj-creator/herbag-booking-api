@@ -537,11 +537,15 @@ export default async function handler(req, res) {
               flex-direction:column;
             }
 
-            .download-btn,
-            .schedule-date,
-            .schedule-toggle{
-              width:100%;
-            }
+            .hero-actions,
+.download-btn,
+.create-btn{
+  width:100%;
+}
+
+.hero-actions{
+  flex-direction:column;
+}
 
             .filters{
               grid-template-columns:1fr 1fr;
