@@ -1,9 +1,0 @@
-{
-  "redirects": [
-    {
-      "source": "/",
-      "destination": "/api/admin-bookings?token=herbag-admin-2026-private-82941",
-      "permanent": false
-    }
-  ]
-}
