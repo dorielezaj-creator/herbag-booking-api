@@ -173,6 +173,23 @@ export default async function handler(req, res) {
             font-weight:700;
           }
 
+          .hero-actions{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.create-btn{
+  min-width:178px;
+  border:1px solid #2a0008;
+  background:#ffffff;
+  color:#2a0008;
+  padding:15px 18px;
+  text-decoration:none;
+  text-align:center;
+  font-weight:700;
+}
+
           .download-btn:disabled{
             background:#bdb7b9;
             border-color:#bdb7b9;
@@ -610,9 +627,15 @@ export default async function handler(req, res) {
               </div>
             </div>
 
-            <button type="button" class="download-btn" id="downloadExcel">
-              Download Excel
-            </button>
+            <div class="hero-actions">
+  <a class="create-btn" href="/api/admin-create-booking?token=${encodeURIComponent(token)}">
+    Create Appointment
+  </a>
+
+  <button type="button" class="download-btn" id="downloadExcel">
+    Download Excel
+  </button>
+</div>
           </header>
 
           ${message ? `<div class="notice">${escapeHtml(message)}</div>` : ''}
