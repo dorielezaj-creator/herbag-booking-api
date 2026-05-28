@@ -1,3 +1,5 @@
+import { isAdminAuthenticated } from './_auth.js';
+
 const escapeHtml = (value = '') =>
   String(value).replace(/[&<>"']/g, (char) => ({
     '&': '&amp;',
@@ -7,10 +9,10 @@ const escapeHtml = (value = '') =>
     "'": '&#039;'
   }[char]));
 
-function redirectToAdmin({ res, token, message }) {
+function redirectToAdmin({ res, message }) {
   const location =
-    `/api/admin-bookings?token=${encodeURIComponent(token)}` +
-    (message ? `&message=${encodeURIComponent(message)}` : '');
+    '/api/admin-bookings' +
+    (message ? `?message=${encodeURIComponent(message)}` : '');
 
   res.writeHead(302, { Location: location });
   return res.end();
@@ -89,26 +91,13 @@ function buildStatusEmail({ booking, status }) {
           <img
             src="${escapeHtml(booking.product_image)}"
             alt="${escapeHtml(booking.product)}"
-            style="
-              width:100%;
-              max-width:420px;
-              height:auto;
-              border:1px solid #e5e5e5;
-              display:block;
-              margin:0 auto 25px;
-            "
+            style="width:100%;max-width:420px;height:auto;border:1px solid #e5e5e5;display:block;margin:0 auto 25px;"
           >
 
           ${
             booking.product_description
               ? `
-          <p style="
-            font-size:14px;
-            line-height:1.8;
-            color:#666;
-            max-width:500px;
-            margin:0 auto;
-          ">
+          <p style="font-size:14px;line-height:1.8;color:#666;max-width:500px;margin:0 auto;">
             ${escapeHtml(booking.product_description)}
           </p>
           `
@@ -167,8 +156,13 @@ export default async function handler(req, res) {
       ? url.searchParams.get('token')
       : req.body?.token || req.headers['x-admin-token'];
 
-  if (token !== process.env.ADMIN_TOKEN) {
-    return res.status(401).json({ error: 'Unauthorized' });
+  if (!isAdminAuthenticated(req) && token !== process.env.ADMIN_TOKEN) {
+    if (req.method === 'GET') {
+      res.writeHead(302, { Location: '/api/login' });
+      return res.end();
+    }
+
+    return res.status(401).send('Unauthorized');
   }
 
   const id = req.method === 'GET' ? url.searchParams.get('id') : req.body?.id;
@@ -198,10 +192,13 @@ export default async function handler(req, res) {
   if (!response.ok) {
     const errorText = await response.text();
 
-    if (req.method === 'GET' && status === 'accepted' && errorText.includes('one_accepted_booking_per_slot')) {
+    if (
+      req.method === 'GET' &&
+      status === 'accepted' &&
+      errorText.includes('one_accepted_booking_per_slot')
+    ) {
       return redirectToAdmin({
         res,
-        token,
         message: 'This time slot is already accepted for another booking. Please cancel the duplicate request or choose a different time.'
       });
     }
@@ -221,7 +218,6 @@ export default async function handler(req, res) {
   if (req.method === 'GET') {
     return redirectToAdmin({
       res,
-      token,
       message:
         status === 'accepted'
           ? 'Appointment accepted and client email sent.'
