@@ -34,7 +34,7 @@ export default async function handler(req, res) {
   );
 
   if (!response.ok) {
-    return res.status(500).send(await response.text());
+     res.status(500).send(await response.text());
   }
 
   const bookings = await response.json();
@@ -51,6 +51,10 @@ export default async function handler(req, res) {
 
     return `
       <article class="card" data-status="${escapeHtml(status)}" data-date="${escapeHtml(booking.selected_date)}" data-time="${escapeHtml(booking.selected_time)}">
+      <label class="select-booking">
+          <input type="checkbox" class="booking-check" value="${escapeHtml(booking.id)}">
+          <span>Select</span>
+        </label>
         <div class="card-top">
           <div>
             <strong>${escapeHtml(booking.first_name)} ${escapeHtml(booking.last_name)}</strong>
@@ -82,6 +86,90 @@ export default async function handler(req, res) {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Herbag Bookings</title>
 <style>
+
+.select-booking{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:18px;
+  color:#7a7070;
+  font-size:13px;
+  cursor:pointer;
+}
+
+.select-booking input,
+.bulk-select input{
+  width:18px;
+  height:18px;
+  accent-color:#28050A;
+}
+
+.card.selected-booking{
+  border-color:#28050A;
+  box-shadow:inset 0 0 0 1px #28050A;
+}
+
+.bulk-bar{
+  display:none;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  margin-bottom:16px;
+  padding:16px;
+  background:#ffffff;
+  border:1px solid #ded5d0;
+}
+
+.bulk-bar.active{
+  display:flex;
+}
+
+.bulk-select{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  cursor:pointer;
+  color:#28050A;
+}
+
+.bulk-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.bulk-actions button{
+  border:1px solid #28050A;
+  background:#28050A;
+  color:#ffffff;
+  padding:11px 14px;
+  cursor:pointer;
+  font:inherit;
+  font-weight:700;
+}
+
+.bulk-actions button.danger{
+  background:#777777;
+  border-color:#777777;
+}
+
+.bulk-actions button:disabled{
+  background:#bdb7b9;
+  border-color:#bdb7b9;
+  cursor:not-allowed;
+}
+
+@media(max-width:760px){
+  .bulk-bar{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+
+  .bulk-actions,
+  .bulk-actions button{
+    width:100%;
+  }
+}
 *{box-sizing:border-box}
 body{margin:0;min-height:100vh;font-family:Arial,sans-serif;background:#f5f1ee;color:#28050A}
 .wrap{width:min(1120px,calc(100% - 36px));margin:0 auto;padding:34px 0 56px}
@@ -232,6 +320,20 @@ ${message ? `<div class="notice">${escapeHtml(message)}</div>` : ''}
   <button type="button" class="clear-slot-filter" id="clearSlotFilter">Clear time filter</button>
 </div>
 
+<div class="bulk-bar" id="bulkBar">
+  <label class="bulk-select">
+    <input type="checkbox" id="selectVisibleBookings">
+    Select visible
+  </label>
+
+  <strong id="selectedCount">0 selected</strong>
+
+  <div class="bulk-actions">
+    <button type="button" data-bulk-action="accepted">Accept selected</button>
+    <button type="button" data-bulk-action="cancelled">Cancel selected</button>
+    <button type="button" data-bulk-action="delete" class="danger">Delete selected</button>
+  </div>
+</div>
 <div id="bookingList">${rows || ''}</div>
 <div class="empty" id="emptyState">No bookings in this filter.</div>
 </div>
@@ -249,6 +351,11 @@ const scheduleGrid = document.getElementById('scheduleGrid');
 const clearSlotFilter = document.getElementById('clearSlotFilter');
 const daySchedule = document.getElementById('daySchedule');
 const scheduleToggle = document.getElementById('scheduleToggle');
+const bulkBar = document.getElementById('bulkBar');
+const selectedCount = document.getElementById('selectedCount');
+const selectVisibleBookings = document.getElementById('selectVisibleBookings');
+const bulkButtons = document.querySelectorAll('[data-bulk-action]');
+const bookingChecks = document.querySelectorAll('.booking-check');
 
 const times = ['10:30','11:15','12:00','12:45','13:30','14:15','15:00','15:45','16:30','17:15','18:00'];
 let currentFilter = 'all';
@@ -353,6 +460,115 @@ function getFilteredBookings() {
   });
 }
 
+function getVisibleCards() {
+  return Array.from(cards).filter(function(card) {
+    return !card.classList.contains('hidden');
+  });
+}
+
+function getSelectedIds() {
+  return Array.from(bookingChecks)
+    .filter(function(input) {
+      return input.checked && !input.closest('.card').classList.contains('hidden');
+    })
+    .map(function(input) {
+      return input.value;
+    });
+}
+
+function updateBulkState() {
+  const selectedIds = getSelectedIds();
+  const visibleCards = getVisibleCards();
+  const visibleChecks = visibleCards
+    .map(function(card) {
+      return card.querySelector('.booking-check');
+    })
+    .filter(Boolean);
+
+  bookingChecks.forEach(function(input) {
+    input.closest('.card').classList.toggle('selected-booking', input.checked);
+  });
+
+  selectedCount.innerText =
+    selectedIds.length === 1
+      ? '1 selected'
+      : selectedIds.length + ' selected';
+
+  bulkBar.classList.toggle('active', selectedIds.length > 0);
+
+  bulkButtons.forEach(function(button) {
+    button.disabled = selectedIds.length === 0;
+  });
+
+  if (selectVisibleBookings) {
+    selectVisibleBookings.checked =
+      visibleChecks.length > 0 &&
+      visibleChecks.every(function(input) {
+        return input.checked;
+      });
+  }
+}
+
+function clearSelections() {
+  bookingChecks.forEach(function(input) {
+    input.checked = false;
+  });
+
+  updateBulkState();
+}
+
+async function runBulkAction(action) {
+  const ids = getSelectedIds();
+
+  if (!ids.length) {
+    return;
+  }
+
+  const label = {
+    accepted: 'accept',
+    cancelled: 'cancel',
+    delete: 'delete permanently'
+  }[action];
+
+  const confirmed = confirm(
+    'Are you sure you want to ' + label + ' ' + ids.length + ' selected booking(s)?'
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  bulkButtons.forEach(function(button) {
+    button.disabled = true;
+  });
+
+  try {
+    const response = await fetch('/api/bulk-booking-action', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        action,
+        ids
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || data.message || 'Bulk action failed.');
+    }
+
+    window.location.href =
+      '/api/admin-bookings?message=' +
+      encodeURIComponent(data.message || 'Bulk action completed.');
+  } catch (error) {
+    alert(error.message);
+    updateBulkState();
+  }
+}
 function applyFilter(filter) {
   currentFilter = filter;
   let visibleCount = 0;
