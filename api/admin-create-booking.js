@@ -1,4 +1,5 @@
 import { isAdminAuthenticated, redirect } from './_auth.js';
+
 const escapeHtml = (value = '') =>
   String(value).replace(/[&<>"']/g, (char) => ({
     '&': '&amp;',
@@ -83,7 +84,7 @@ function buildClientEmail({ booking }) {
 `;
 }
 
-function renderPage({ token }) {
+function renderPage() {
   return `
 <!doctype html>
 <html>
@@ -230,7 +231,7 @@ function renderPage({ token }) {
     <div class="wrap">
       <div class="top">
         <h1>Create Appointment</h1>
-        <a class="back" href="/api/admin-bookings?token=${encodeURIComponent(token)}">Back to Bookings</a>
+        <a class="back" href="/api/admin-bookings">Back to Bookings</a>
       </div>
 
       <form id="adminCreateForm">
@@ -302,7 +303,6 @@ function renderPage({ token }) {
     </div>
 
     <script>
-      const token = ${JSON.stringify(token)};
       const form = document.getElementById('adminCreateForm');
       const message = document.getElementById('formMessage');
 
@@ -313,7 +313,6 @@ function renderPage({ token }) {
         const formData = new FormData(form);
 
         const payload = {
-          token,
           first_name: formData.get('first_name'),
           last_name: formData.get('last_name'),
           email: formData.get('email'),
@@ -332,6 +331,7 @@ function renderPage({ token }) {
         try {
           const response = await fetch('/api/admin-create-booking', {
             method: 'POST',
+            credentials: 'same-origin',
             headers: {
               'Content-Type': 'application/json'
             },
@@ -345,8 +345,8 @@ function renderPage({ token }) {
           }
 
           window.location.href =
-            '/api/admin-bookings?token=' + encodeURIComponent(token) +
-            '&message=' + encodeURIComponent('Appointment created and client email sent.');
+            '/api/admin-bookings?message=' +
+            encodeURIComponent('Appointment created and client email sent.');
         } catch (error) {
           message.className = 'message error';
           message.innerText = error.message;
@@ -362,20 +362,17 @@ function renderPage({ token }) {
 }
 
 export default async function handler(req, res) {
-  const url = new URL(req.url, `https://${req.headers.host}`);
+  if (!isAdminAuthenticated(req)) {
+    if (req.method === 'GET') {
+      return redirect(res, '/api/login');
+    }
 
-  const token =
-    req.method === 'GET'
-      ? url.searchParams.get('token')
-      : req.body?.token;
-
-  if (token !== process.env.ADMIN_TOKEN) {
-    return res.status(401).send('Unauthorized');
+    return res.status(401).json({ error: 'Unauthorized' });
   }
 
   if (req.method === 'GET') {
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    return res.status(200).send(renderPage({ token }));
+    return res.status(200).send(renderPage());
   }
 
   if (req.method !== 'POST') {
