@@ -1,3 +1,4 @@
+import { isAdminAuthenticated, redirect } from './_auth.js';
 const escapeHtml = (value = '') =>
   String(value).replace(/[&<>"']/g, (char) => ({
     '&': '&amp;',
