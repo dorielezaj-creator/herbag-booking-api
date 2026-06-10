@@ -374,8 +374,8 @@ export default async function handler(req, res) {
           'Content-Type': 'application/json'
         },
        body: JSON.stringify({
-  from: 'Herbag <info@herbag.al>',
-  to: [process.env.ADMIN_EMAIL || 'info@herbag.al'],
+  from: 'Herbag <herbag.lake@gmail.com>',
+  to: [process.env.ADMIN_EMAIL || 'herbag.lake@gmail.com'],
   subject: `New Appointment Request - ${confirmation_code}`,
   html: adminEmailHtml
 })
@@ -391,7 +391,7 @@ export default async function handler(req, res) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          from: 'Herbag <info@herbag.al>',
+          from: 'Herbag <herbag.lake@gmail.com>',
           to: [email],
           subject: `Your Herbag Appointment Request - ${confirmation_code}`,
           html: clientEmailHtml
