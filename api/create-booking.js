@@ -375,7 +375,7 @@ export default async function handler(req, res) {
     },
     body: JSON.stringify({
       from: 'Herbag <info@herbag.al>',
-      to: [process.env.ADMIN_EMAIL || 'herbag.lake@gmail.com'],
+      to: ['herbag.lake@gmail.com'],
       subject: `New Appointment Request - ${confirmation_code}`,
       html: adminEmailHtml
     })
