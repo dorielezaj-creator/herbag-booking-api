@@ -373,12 +373,12 @@ export default async function handler(req, res) {
           Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          from: 'Herbag <info@herbag.al>',
-          to: ['info@herbag.al'],
-          subject: `New Appointment Request - ${confirmation_code}`,
-          html: adminEmailHtml
-        })
+       body: JSON.stringify({
+  from: 'Herbag <info@herbag.al>',
+  to: [process.env.ADMIN_EMAIL || 'info@herbag.al'],
+  subject: `New Appointment Request - ${confirmation_code}`,
+  html: adminEmailHtml
+})
       }
     );
 
