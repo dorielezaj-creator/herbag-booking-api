@@ -94,126 +94,24 @@ function renderPage() {
 
     <style>
       *{box-sizing:border-box}
-
-      body{
-        margin:0;
-        min-height:100vh;
-        font-family:Arial,sans-serif;
-        background:#f5f1ee;
-        color:#2a0008;
-        padding:28px;
-      }
-
-      .wrap{
-        width:min(760px, 100%);
-        margin:auto;
-      }
-
-      .top{
-        display:flex;
-        align-items:center;
-        justify-content:space-between;
-        gap:18px;
-        margin-bottom:22px;
-      }
-
-      h1{
-        margin:0;
-        font-size:34px;
-      }
-
-      .back{
-        color:#2a0008;
-        text-decoration:none;
-        border:1px solid currentColor;
-        padding:12px 16px;
-        background:#fff;
-      }
-
-      form{
-        background:#fff;
-        border:1px solid #ded5d0;
-        padding:24px;
-      }
-
-      .grid{
-        display:grid;
-        grid-template-columns:1fr 1fr;
-        gap:16px;
-      }
-
-      label{
-        display:block;
-        margin-bottom:7px;
-        color:#8c8080;
-        font-size:11px;
-        letter-spacing:.14em;
-        text-transform:uppercase;
-      }
-
-      input,
-      select,
-      textarea{
-        width:100%;
-        border:1px solid #2a0008;
-        background:#fff;
-        color:#2a0008;
-        padding:14px;
-        font:inherit;
-      }
-
-      input[type="date"],
-      select,
-      .date-field,
-      .time-field{
-        cursor:pointer;
-      }
-
-      select:disabled{
-        color:#8c8080;
-        border-color:#bdb7b9;
-        cursor:not-allowed;
-      }
-
-      textarea{
-        min-height:120px;
-        resize:vertical;
-      }
-
-      .field{
-        margin-bottom:16px;
-      }
-
-      .full{
-        grid-column:1 / -1;
-      }
-
-      button{
-        width:100%;
-        border:1px solid #2a0008;
-        background:#2a0008;
-        color:#fff;
-        padding:16px 18px;
-        cursor:pointer;
-        font:inherit;
-        font-weight:700;
-      }
-
-      button:disabled{
-        background:#bdb7b9;
-        border-color:#bdb7b9;
-        cursor:not-allowed;
-      }
-
-      .message{
-        margin-top:16px;
-        font-weight:700;
-      }
-
-      .message.error{
-        color:#9b1c31;
-      }
-
+      body{margin:0;min-height:100vh;font-family:Arial,sans-serif;background:#f5f1ee;color:#2a0008;padding:28px}
+      .wrap{width:min(760px,100%);margin:auto}
+      .top{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:22px}
+      h1{margin:0;font-size:34px}
+      .back{color:#2a0008;text-decoration:none;border:1px solid currentColor;padding:12px 16px;background:#fff}
+      form{background:#fff;border:1px solid #ded5d0;padding:24px}
+      .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+      label{display:block;margin-bottom:7px;color:#8c8080;font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+      input,select,textarea{width:100%;border:1px solid #2a0008;background:#fff;color:#2a0008;padding:14px;font:inherit}
+      input[type="date"],select,.date-field,.time-field{cursor:pointer}
+      select:disabled{color:#8c8080;border-color:#bdb7b9;cursor:not-allowed}
+      textarea{min-height:120px;resize:vertical}
+      .field{margin-bottom:16px}
+      .full{grid-column:1 / -1}
+      button{width:100%;border:1px solid #2a0008;background:#2a0008;color:#fff;padding:16px 18px;cursor:pointer;font:inherit;font-weight:700}
+      button:disabled{background:#bdb7b9;border-color:#bdb7b9;cursor:not-allowed}
+      .message{margin-top:16px;font-weight:700}
+      .message.error{color:#9b1c31}
       @media(max-width:640px){
         body{padding:16px}
         .top{flex-direction:column;align-items:flex-start}
@@ -347,9 +245,11 @@ function renderPage() {
 
       function resetTimeSelect(label) {
         timeSelect.innerHTML = '';
+
         const option = document.createElement('option');
         option.value = '';
         option.textContent = label || 'Select time';
+
         timeSelect.appendChild(option);
         timeSelect.value = '';
       }
@@ -466,7 +366,6 @@ function renderPage() {
 
         const button = form.querySelector('button[type="submit"]');
         const formData = new FormData(form);
-
         const selectedOption = timeSelect.options[timeSelect.selectedIndex];
 
         if (!dateInput.value || !timeSelect.value || (selectedOption && selectedOption.disabled)) {
@@ -576,12 +475,12 @@ export default async function handler(req, res) {
   };
 
   const supabaseResponse = await fetch(
-    \`\${process.env.SUPABASE_URL}/rest/v1/bookings\`,
+    `${process.env.SUPABASE_URL}/rest/v1/bookings`,
     {
       method: 'POST',
       headers: {
         apikey: process.env.SUPABASE_SERVICE_ROLE_KEY,
-        Authorization: \`Bearer \${process.env.SUPABASE_SERVICE_ROLE_KEY}\`,
+        Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
         'Content-Type': 'application/json',
         Prefer: 'return=representation'
       },
@@ -611,13 +510,13 @@ export default async function handler(req, res) {
     {
       method: 'POST',
       headers: {
-        Authorization: \`Bearer \${process.env.RESEND_API_KEY}\`,
+        Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
         from: 'Herbag <info@herbag.al>',
         to: [email],
-        subject: \`Your Herbag Appointment Is Confirmed - \${confirmation_code}\`,
+        subject: `Your Herbag Appointment Is Confirmed - ${confirmation_code}`,
         html: buildClientEmail({ booking })
       })
     }
