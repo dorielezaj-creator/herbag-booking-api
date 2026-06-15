@@ -93,7 +93,7 @@ function renderPage() {
     <title>Create Appointment</title>
 
     <style>
-      *{box-sizing:border-box;}
+      *{box-sizing:border-box}
 
       body{
         margin:0;
@@ -162,6 +162,19 @@ function renderPage() {
         font:inherit;
       }
 
+      input[type="date"],
+      select,
+      .date-field,
+      .time-field{
+        cursor:pointer;
+      }
+
+      select:disabled{
+        color:#8c8080;
+        border-color:#bdb7b9;
+        cursor:not-allowed;
+      }
+
       textarea{
         min-height:120px;
         resize:vertical;
@@ -202,27 +215,11 @@ function renderPage() {
       }
 
       @media(max-width:640px){
-        body{
-          padding:16px;
-        }
-
-        .top{
-          flex-direction:column;
-          align-items:flex-start;
-        }
-
-        .back{
-          width:100%;
-          text-align:center;
-        }
-
-        .grid{
-          grid-template-columns:1fr;
-        }
-
-        form{
-          padding:18px;
-        }
+        body{padding:16px}
+        .top{flex-direction:column;align-items:flex-start}
+        .back{width:100%;text-align:center}
+        .grid{grid-template-columns:1fr}
+        form{padding:18px}
       }
     </style>
   </head>
@@ -268,26 +265,15 @@ function renderPage() {
             </datalist>
           </div>
 
-          <div class="field">
+          <div class="field date-field">
             <label>Date</label>
             <input type="date" name="selected_date" required>
           </div>
 
-          <div class="field">
+          <div class="field time-field">
             <label>Time</label>
-            <select name="selected_time" required>
-              <option value="">Select time</option>
-              <option value="10:30">10:30</option>
-              <option value="11:15">11:15</option>
-              <option value="12:00">12:00</option>
-              <option value="12:45">12:45</option>
-              <option value="13:30">13:30</option>
-              <option value="14:15">14:15</option>
-              <option value="15:00">15:00</option>
-              <option value="15:45">15:45</option>
-              <option value="16:30">16:30</option>
-              <option value="17:15">17:15</option>
-              <option value="18:00">18:00</option>
+            <select name="selected_time" required disabled>
+              <option value="">Select date first</option>
             </select>
           </div>
 
@@ -305,12 +291,189 @@ function renderPage() {
     <script>
       const form = document.getElementById('adminCreateForm');
       const message = document.getElementById('formMessage');
+      const dateInput = form.elements.selected_date;
+      const timeSelect = form.elements.selected_time;
+      const dateField = dateInput.closest('.date-field');
+      const timeField = timeSelect.closest('.time-field');
+
+      const times = [
+        '10:30',
+        '11:15',
+        '12:00',
+        '12:45',
+        '13:30',
+        '14:15',
+        '15:00',
+        '15:45',
+        '16:30',
+        '17:15',
+        '18:00'
+      ];
+
+      function todayIso() {
+        const today = new Date();
+        const local = new Date(today.getTime() - today.getTimezoneOffset() * 60000);
+        return local.toISOString().slice(0, 10);
+      }
+
+      function getMinutes(time) {
+        const parts = String(time || '').split(':');
+        return Number(parts[0]) * 60 + Number(parts[1]);
+      }
+
+      function isPastSlot(date, time) {
+        if (!date || !time) return false;
+
+        const today = todayIso();
+
+        if (date < today) return true;
+        if (date > today) return false;
+
+        const now = new Date();
+        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+        return getMinutes(time) <= currentMinutes;
+      }
+
+      function openPicker(input) {
+        input.focus();
+
+        if (typeof input.showPicker === 'function') {
+          try {
+            input.showPicker();
+          } catch (error) {}
+        }
+      }
+
+      function resetTimeSelect(label) {
+        timeSelect.innerHTML = '';
+        const option = document.createElement('option');
+        option.value = '';
+        option.textContent = label || 'Select time';
+        timeSelect.appendChild(option);
+        timeSelect.value = '';
+      }
+
+      function renderTimeOptions(bookedTimes) {
+        const selectedDate = dateInput.value;
+        const booked = new Set(bookedTimes || []);
+
+        resetTimeSelect('Select time');
+
+        times.forEach(function(time) {
+          const option = document.createElement('option');
+          const isBooked = booked.has(time);
+          const isPast = isPastSlot(selectedDate, time);
+
+          option.value = time;
+          option.textContent = time;
+          option.disabled = isBooked || isPast;
+
+          if (isBooked) {
+            option.textContent = time + ' - Booked';
+          }
+
+          if (!isBooked && isPast) {
+            option.textContent = time + ' - Passed';
+          }
+
+          timeSelect.appendChild(option);
+        });
+
+        timeSelect.disabled = !selectedDate;
+      }
+
+      async function loadBookedSlots(date) {
+        if (!date) {
+          timeSelect.disabled = true;
+          resetTimeSelect('Select date first');
+          return;
+        }
+
+        timeSelect.disabled = true;
+        resetTimeSelect('Loading times...');
+
+        try {
+          const response = await fetch('/api/booked-slots?date=' + encodeURIComponent(date), {
+            credentials: 'same-origin'
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.error || 'Could not load booked slots.');
+          }
+
+          renderTimeOptions(data.booked_times || []);
+        } catch (error) {
+          resetTimeSelect('Could not load times');
+          message.className = 'message error';
+          message.innerText = error.message;
+        }
+      }
+
+      dateInput.min = todayIso();
+
+      dateInput.addEventListener('click', function() {
+        openPicker(dateInput);
+      });
+
+      if (dateField) {
+        dateField.addEventListener('click', function(event) {
+          if (event.target === dateInput) return;
+          openPicker(dateInput);
+        });
+      }
+
+      if (timeField) {
+        timeField.addEventListener('click', function(event) {
+          if (!dateInput.value || timeSelect.disabled) return;
+          if (event.target === timeSelect) return;
+          openPicker(timeSelect);
+        });
+      }
+
+      dateInput.addEventListener('change', function() {
+        message.innerText = '';
+        message.className = 'message';
+
+        if (dateInput.value && dateInput.value < todayIso()) {
+          alert('Please select today or a future date.');
+          dateInput.value = '';
+          timeSelect.disabled = true;
+          resetTimeSelect('Select date first');
+          return;
+        }
+
+        const selected = new Date(dateInput.value + 'T12:00:00');
+        const day = selected.getDay();
+
+        if (day === 0) {
+          alert('Sunday is closed. Please select another date.');
+          dateInput.value = '';
+          timeSelect.disabled = true;
+          resetTimeSelect('Select date first');
+          return;
+        }
+
+        loadBookedSlots(dateInput.value);
+      });
+
+      resetTimeSelect('Select date first');
 
       form.addEventListener('submit', async function(event) {
         event.preventDefault();
 
         const button = form.querySelector('button[type="submit"]');
         const formData = new FormData(form);
+
+        const selectedOption = timeSelect.options[timeSelect.selectedIndex];
+
+        if (!dateInput.value || !timeSelect.value || (selectedOption && selectedOption.disabled)) {
+          message.className = 'message error';
+          message.innerText = 'Please select an available date and time.';
+          return;
+        }
 
         const payload = {
           first_name: formData.get('first_name'),
@@ -413,12 +576,12 @@ export default async function handler(req, res) {
   };
 
   const supabaseResponse = await fetch(
-    `${process.env.SUPABASE_URL}/rest/v1/bookings`,
+    \`\${process.env.SUPABASE_URL}/rest/v1/bookings\`,
     {
       method: 'POST',
       headers: {
         apikey: process.env.SUPABASE_SERVICE_ROLE_KEY,
-        Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
+        Authorization: \`Bearer \${process.env.SUPABASE_SERVICE_ROLE_KEY}\`,
         'Content-Type': 'application/json',
         Prefer: 'return=representation'
       },
@@ -448,13 +611,13 @@ export default async function handler(req, res) {
     {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+        Authorization: \`Bearer \${process.env.RESEND_API_KEY}\`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
         from: 'Herbag <info@herbag.al>',
         to: [email],
-        subject: `Your Herbag Appointment Is Confirmed - ${confirmation_code}`,
+        subject: \`Your Herbag Appointment Is Confirmed - \${confirmation_code}\`,
         html: buildClientEmail({ booking })
       })
     }
