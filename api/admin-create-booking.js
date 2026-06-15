@@ -93,31 +93,198 @@ function renderPage() {
     <title>Create Appointment</title>
 
     <style>
-      *{box-sizing:border-box}
-      body{margin:0;min-height:100vh;font-family:Arial,sans-serif;background:#f5f1ee;color:#2a0008;padding:28px}
-      .wrap{width:min(760px,100%);margin:auto}
-      .top{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:22px}
-      h1{margin:0;font-size:34px}
-      .back{color:#2a0008;text-decoration:none;border:1px solid currentColor;padding:12px 16px;background:#fff}
-      form{background:#fff;border:1px solid #ded5d0;padding:24px}
-      .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-      label{display:block;margin-bottom:7px;color:#8c8080;font-size:11px;letter-spacing:.14em;text-transform:uppercase}
-      input,select,textarea{width:100%;border:1px solid #2a0008;background:#fff;color:#2a0008;padding:14px;font:inherit}
-      input[type="date"],select,.date-field,.time-field{cursor:pointer}
-      select:disabled{color:#8c8080;border-color:#bdb7b9;cursor:not-allowed}
-      textarea{min-height:120px;resize:vertical}
-      .field{margin-bottom:16px}
-      .full{grid-column:1 / -1}
-      button{width:100%;border:1px solid #2a0008;background:#2a0008;color:#fff;padding:16px 18px;cursor:pointer;font:inherit;font-weight:700}
-      button:disabled{background:#bdb7b9;border-color:#bdb7b9;cursor:not-allowed}
-      .message{margin-top:16px;font-weight:700}
-      .message.error{color:#9b1c31}
+      *{box-sizing:border-box;}
+
+      body{
+        margin:0;
+        min-height:100vh;
+        font-family:Arial,sans-serif;
+        background:#f5f1ee;
+        color:#2a0008;
+        padding:28px;
+      }
+
+      .wrap{
+        width:min(760px, 100%);
+        margin:auto;
+      }
+
+      .top{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:18px;
+        margin-bottom:22px;
+      }
+
+      h1{
+        margin:0;
+        font-size:34px;
+      }
+
+      .back{
+        color:#2a0008;
+        text-decoration:none;
+        border:1px solid currentColor;
+        padding:12px 16px;
+        background:#fff;
+      }
+
+      form{
+        background:#fff;
+        border:1px solid #ded5d0;
+        padding:24px;
+      }
+
+      .grid{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:16px;
+      }
+
+      label{
+        display:block;
+        margin-bottom:7px;
+        color:#8c8080;
+        font-size:11px;
+        letter-spacing:.14em;
+        text-transform:uppercase;
+      }
+
+      input,
+      textarea{
+        width:100%;
+        border:1px solid #2a0008;
+        background:#fff;
+        color:#2a0008;
+        padding:14px;
+        font:inherit;
+      }
+
+      input[type="date"]{
+        cursor:pointer;
+      }
+
+      textarea{
+        min-height:120px;
+        resize:vertical;
+      }
+
+      .field{
+        margin-bottom:16px;
+      }
+
+      .full{
+        grid-column:1 / -1;
+      }
+
+      .time-slots{
+        display:grid;
+        grid-template-columns:repeat(3, 1fr);
+        gap:10px;
+        border:1px solid #2a0008;
+        padding:12px;
+        min-height:74px;
+      }
+
+      .time-slot{
+        width:100%;
+        min-height:54px;
+        border:1px solid rgba(42, 0, 8, .32);
+        background:#fff;
+        color:#2a0008;
+        padding:9px 8px;
+        cursor:pointer;
+        font:inherit;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+        gap:3px;
+      }
+
+      .time-slot:hover,
+      .time-slot.selected{
+        border-color:#2a0008;
+        background:#f8f6f4;
+      }
+
+      .time-slot.booked,
+      .time-slot.passed{
+        background:#eeeeee;
+        border-color:#c7c0c0;
+        color:#8c8080;
+        cursor:not-allowed;
+        opacity:1;
+        text-decoration:line-through;
+      }
+
+      .time-slot small{
+        font-size:10px;
+        letter-spacing:.12em;
+        text-transform:uppercase;
+        text-decoration:none;
+      }
+
+      .time-empty{
+        grid-column:1 / -1;
+        color:#8c8080;
+        padding:16px;
+        text-align:center;
+      }
+
+      button[type="submit"]{
+        width:100%;
+        border:1px solid #2a0008;
+        background:#2a0008;
+        color:#fff;
+        padding:16px 18px;
+        cursor:pointer;
+        font:inherit;
+        font-weight:700;
+      }
+
+      button[type="submit"]:disabled{
+        background:#bdb7b9;
+        border-color:#bdb7b9;
+        cursor:not-allowed;
+      }
+
+      .message{
+        margin-top:16px;
+        font-weight:700;
+      }
+
+      .message.error{
+        color:#9b1c31;
+      }
+
       @media(max-width:640px){
-        body{padding:16px}
-        .top{flex-direction:column;align-items:flex-start}
-        .back{width:100%;text-align:center}
-        .grid{grid-template-columns:1fr}
-        form{padding:18px}
+        body{
+          padding:16px;
+        }
+
+        .top{
+          flex-direction:column;
+          align-items:flex-start;
+        }
+
+        .back{
+          width:100%;
+          text-align:center;
+        }
+
+        .grid{
+          grid-template-columns:1fr;
+        }
+
+        .time-slots{
+          grid-template-columns:repeat(2, 1fr);
+        }
+
+        form{
+          padding:18px;
+        }
       }
     </style>
   </head>
@@ -168,11 +335,12 @@ function renderPage() {
             <input type="date" name="selected_date" required>
           </div>
 
-          <div class="field time-field">
+          <div class="field">
             <label>Time</label>
-            <select name="selected_time" required disabled>
-              <option value="">Select date first</option>
-            </select>
+            <input type="hidden" name="selected_time">
+            <div class="time-slots" id="timeSlots">
+              <div class="time-empty">Select date first</div>
+            </div>
           </div>
 
           <div class="field full">
@@ -190,9 +358,8 @@ function renderPage() {
       const form = document.getElementById('adminCreateForm');
       const message = document.getElementById('formMessage');
       const dateInput = form.elements.selected_date;
-      const timeSelect = form.elements.selected_time;
-      const dateField = dateInput.closest('.date-field');
-      const timeField = timeSelect.closest('.time-field');
+      const timeInput = form.elements.selected_time;
+      const timeSlots = document.getElementById('timeSlots');
 
       const times = [
         '10:30',
@@ -208,167 +375,161 @@ function renderPage() {
         '18:00'
       ];
 
-      function todayIso() {
-        const today = new Date();
-        const local = new Date(today.getTime() - today.getTimezoneOffset() * 60000);
-        return local.toISOString().slice(0, 10);
+      function formatLocalDate(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return year + '-' + month + '-' + day;
       }
 
-      function getMinutes(time) {
-        const parts = String(time || '').split(':');
+      function timeMinutes(value) {
+        const parts = String(value || '').split(':');
         return Number(parts[0]) * 60 + Number(parts[1]);
       }
 
-      function isPastSlot(date, time) {
-        if (!date || !time) return false;
+      function isPastSlot(dateValue, timeValue) {
+        const today = formatLocalDate(new Date());
 
-        const today = todayIso();
-
-        if (date < today) return true;
-        if (date > today) return false;
+        if (dateValue < today) return true;
+        if (dateValue > today) return false;
 
         const now = new Date();
         const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
-        return getMinutes(time) <= currentMinutes;
+        return timeMinutes(timeValue) <= currentMinutes;
       }
 
-      function openPicker(input) {
-        input.focus();
+      function openDatePicker() {
+        dateInput.focus();
 
-        if (typeof input.showPicker === 'function') {
+        if (typeof dateInput.showPicker === 'function') {
           try {
-            input.showPicker();
+            dateInput.showPicker();
           } catch (error) {}
         }
       }
 
-      function resetTimeSelect(label) {
-        timeSelect.innerHTML = '';
-
-        const option = document.createElement('option');
-        option.value = '';
-        option.textContent = label || 'Select time';
-
-        timeSelect.appendChild(option);
-        timeSelect.value = '';
+      function resetTimeSlots(text) {
+        timeInput.value = '';
+        timeSlots.innerHTML = '<div class="time-empty">' + text + '</div>';
       }
 
-      function renderTimeOptions(bookedTimes) {
-        const selectedDate = dateInput.value;
-        const booked = new Set(bookedTimes || []);
+      function selectTime(time, button) {
+        if (button.disabled) return;
 
-        resetTimeSelect('Select time');
-
-        times.forEach(function(time) {
-          const option = document.createElement('option');
-          const isBooked = booked.has(time);
-          const isPast = isPastSlot(selectedDate, time);
-
-          option.value = time;
-          option.textContent = time;
-          option.disabled = isBooked || isPast;
-
-          if (isBooked) {
-            option.textContent = time + ' - Booked';
-          }
-
-          if (!isBooked && isPast) {
-            option.textContent = time + ' - Passed';
-          }
-
-          timeSelect.appendChild(option);
+        timeSlots.querySelectorAll('.time-slot').forEach(function(slot) {
+          slot.classList.remove('selected');
         });
 
-        timeSelect.disabled = !selectedDate;
+        button.classList.add('selected');
+        timeInput.value = time;
+      }
+
+      function renderTimeSlots(bookedTimes) {
+        const dateValue = dateInput.value;
+        const booked = Array.isArray(bookedTimes) ? bookedTimes : [];
+
+        timeInput.value = '';
+        timeSlots.innerHTML = '';
+
+        if (!dateValue) {
+          resetTimeSlots('Select date first');
+          return;
+        }
+
+        times.forEach(function(time) {
+          const button = document.createElement('button');
+          const isBooked = booked.includes(time);
+          const isPassed = isPastSlot(dateValue, time);
+
+          button.type = 'button';
+          button.className = 'time-slot';
+          button.dataset.time = time;
+
+          if (isBooked) {
+            button.classList.add('booked');
+            button.disabled = true;
+            button.innerHTML = '<span>' + time + '</span><small>Booked</small>';
+          } else if (isPassed) {
+            button.classList.add('passed');
+            button.disabled = true;
+            button.innerHTML = '<span>' + time + '</span><small>Passed</small>';
+          } else {
+            button.textContent = time;
+            button.addEventListener('click', function() {
+              selectTime(time, button);
+            });
+          }
+
+          timeSlots.appendChild(button);
+        });
       }
 
       async function loadBookedSlots(date) {
         if (!date) {
-          timeSelect.disabled = true;
-          resetTimeSelect('Select date first');
+          resetTimeSlots('Select date first');
           return;
         }
 
-        timeSelect.disabled = true;
-        resetTimeSelect('Loading times...');
+        resetTimeSlots('Loading times...');
 
         try {
           const response = await fetch('/api/booked-slots?date=' + encodeURIComponent(date), {
             credentials: 'same-origin'
           });
 
-          const data = await response.json();
-
           if (!response.ok) {
-            throw new Error(data.error || 'Could not load booked slots.');
+            throw new Error('Could not load booked slots.');
           }
 
-          renderTimeOptions(data.booked_times || []);
+          const data = await response.json();
+          renderTimeSlots(data.booked_times || []);
         } catch (error) {
-          resetTimeSelect('Could not load times');
-          message.className = 'message error';
-          message.innerText = error.message;
+          resetTimeSlots('Could not load booked slots');
         }
       }
 
-      dateInput.min = todayIso();
+      dateInput.min = formatLocalDate(new Date());
 
-      dateInput.addEventListener('click', function() {
-        openPicker(dateInput);
-      });
+      dateInput.addEventListener('click', openDatePicker);
+
+      const dateField = dateInput.closest('.date-field');
 
       if (dateField) {
         dateField.addEventListener('click', function(event) {
           if (event.target === dateInput) return;
-          openPicker(dateInput);
-        });
-      }
-
-      if (timeField) {
-        timeField.addEventListener('click', function(event) {
-          if (!dateInput.value || timeSelect.disabled) return;
-          if (event.target === timeSelect) return;
-          openPicker(timeSelect);
+          openDatePicker();
         });
       }
 
       dateInput.addEventListener('change', function() {
-        message.innerText = '';
-        message.className = 'message';
+        const today = formatLocalDate(new Date());
+        const selected = new Date(this.value + 'T12:00:00');
 
-        if (dateInput.value && dateInput.value < todayIso()) {
+        if (this.value < today) {
           alert('Please select today or a future date.');
-          dateInput.value = '';
-          timeSelect.disabled = true;
-          resetTimeSelect('Select date first');
+          this.value = '';
+          resetTimeSlots('Select date first');
           return;
         }
 
-        const selected = new Date(dateInput.value + 'T12:00:00');
-        const day = selected.getDay();
-
-        if (day === 0) {
+        if (selected.getDay() === 0) {
           alert('Sunday is closed. Please select another date.');
-          dateInput.value = '';
-          timeSelect.disabled = true;
-          resetTimeSelect('Select date first');
+          this.value = '';
+          resetTimeSlots('Select date first');
           return;
         }
 
-        loadBookedSlots(dateInput.value);
+        loadBookedSlots(this.value);
       });
-
-      resetTimeSelect('Select date first');
 
       form.addEventListener('submit', async function(event) {
         event.preventDefault();
 
         const button = form.querySelector('button[type="submit"]');
         const formData = new FormData(form);
-        const selectedOption = timeSelect.options[timeSelect.selectedIndex];
 
-        if (!dateInput.value || !timeSelect.value || (selectedOption && selectedOption.disabled)) {
+        if (!dateInput.value || !timeInput.value) {
           message.className = 'message error';
           message.innerText = 'Please select an available date and time.';
           return;
@@ -441,6 +602,11 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  const body =
+    typeof req.body === 'string'
+      ? JSON.parse(req.body || '{}')
+      : req.body || {};
+
   const {
     first_name,
     last_name,
@@ -450,7 +616,7 @@ export default async function handler(req, res) {
     selected_date,
     selected_time,
     notes
-  } = req.body;
+  } = body;
 
   if (!first_name || !last_name || !email || !phone || !product || !selected_date || !selected_time) {
     return res.status(400).json({ error: 'Missing required fields.' });
