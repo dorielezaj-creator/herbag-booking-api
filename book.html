@@ -1,5 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <title>Book an Appointment | HERBAG</title>
+  <link rel="stylesheet" href="/book.css">
+</head>
+<body>
+<header class="herbag-standalone-header">
+  <a href="https://herbag.al/collections/all" class="herbag-header-icon" aria-label="Products">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M3 6h18M3 12h18M3 18h18"/>
+    </svg>
+  </a>
 
-<link rel="stylesheet" href="/book.css">
+  <a href="https://herbag.al" class="herbag-header-logo" aria-label="HERBAG home">
+    <img
+      src="https://herbag.al/cdn/shop/files/herbag_icon_29272342-eddb-4b08-886d-5b126b09334a.svg?v=1778229865&width=200"
+      alt="HERBAG"
+    >
+  </a>
+
+  <a href="https://herbag.al/account" class="herbag-header-icon herbag-header-account" aria-label="Account">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="8" r="4"/>
+      <path d="M4.5 21c.4-5 3-7.5 7.5-7.5S19.1 16 19.5 21"/>
+    </svg>
+  </a>
+</header>
+
+<main>
 <div class="herbag-booking-elegant">
   <div class="herbag-booking-header">
     <h2 class="h5">BOOK AN APPOINTMENT</h2>
@@ -94,356 +125,6 @@
     </form>
   </div>
 </div>
-
-<style>
-.herbag-time-scroll button.past{
-  display:none !important;
-}
-
-
-
-.herbag-booking-elegant {
-  --herbag-brand: #28050A;
-  --herbag-brand-rgb: 40, 5, 10;
-  max-width: 980px;
-  margin: 70px auto;
-  padding: 0 20px;
-  font-family: inherit;
-  color: inherit;
-}
-
-.herbag-booking-header {
-  text-align: center;
-  margin-bottom: 34px;
-}
-
-.herbag-booking-header h2 {
-  margin: 0 0 12px;
-}
-
-.herbag-booking-header p {
-  margin: 0;
-  opacity: 1;
-  color: inherit;
-}
-
-.herbag-steps {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-  margin-bottom: 34px;
-}
-
-.herbag-step {
-  border: 1px solid rgba(var(--herbag-brand-rgb), .28) !important;
-  min-height: 58px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 0 16px;
-  color: rgba(var(--herbag-brand-rgb), .42) !important;
-  background: transparent !important;
-  opacity: 1 !important;
-}
-
-.herbag-step.active {
-  border: 1px solid var(--herbag-brand) !important;
-  color: var(--herbag-brand) !important;
-  background: transparent !important;
-}
-
-.herbag-step span {
-  width: 28px;
-  height: 28px;
-  background: rgba(var(--herbag-brand-rgb), .04) !important;
-  color: rgba(var(--herbag-brand-rgb), .42) !important;
-  border: 1px solid rgba(var(--herbag-brand-rgb), .16) !important;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.herbag-step.active span {
-  background: transparent !important;
-  color: var(--herbag-brand) !important;
-  border: 1px solid var(--herbag-brand) !important;
-}
-
-.herbag-step p {
-  margin: 0;
-  color: inherit !important;
-}
-
-.herbag-step-panel {
-  display: none;
-}
-
-.herbag-step-panel.active {
-  display: block;
-}
-
-.herbag-label {
-  display: block;
-  margin-bottom: 16px;
-}
-
-.herbag-service-list {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  margin-bottom: 28px;
-}
-
-.herbag-service {
-  min-height: 92px;
-  padding: 16px 18px;
-  text-align: left;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  font-family: inherit;
-  background: transparent !important;
-  color: rgba(var(--herbag-brand-rgb), .42) !important;
-  border: 1px solid rgba(var(--herbag-brand-rgb), .28) !important;
-  box-shadow: none !important;
-  opacity: 1 !important;
-}
-
-.herbag-service span {
-  color: inherit !important;
-  opacity: 1 !important;
-}
-
-.herbag-service.selected {
-  background: transparent !important;
-  color: var(--herbag-brand) !important;
-  border: 1px solid var(--herbag-brand) !important;
-  box-shadow: none !important;
-  opacity: 1 !important;
-}
-
-.herbag-service.selected span {
-  color: var(--herbag-brand) !important;
-}
-
-.herbag-step-panel input,
-.herbag-step-panel textarea {
-  width: 100%;
-  border: 1px solid currentColor;
-  padding: 18px 20px;
-  margin-bottom: 16px;
-  font-family: inherit;
-  background: transparent;
-  color: inherit;
-}
-
-.herbag-time-scroll {
-  display: flex !important;
-  flex-direction: row !important;
-  flex-wrap: nowrap !important;
-  gap: 12px !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  overflow-x: auto !important;
-  overflow-y: hidden !important;
-  padding-bottom: 12px !important;
-  margin-bottom: 24px !important;
-  -webkit-overflow-scrolling: touch;
-  scroll-behavior: smooth;
-}
-
-.herbag-time-scroll button {
-  position: relative;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  flex: 0 0 170px !important;
-  width: 170px !important;
-  min-width: 170px !important;
-  max-width: 170px !important;
-  height: 54px !important;
-  margin: 0 !important;
-  border: 1px solid currentColor;
-  background: transparent;
-  color: inherit;
-  font-family: inherit;
-  cursor: pointer;
-  white-space: nowrap !important;
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-.herbag-time-scroll button:not(.selected):not(.booked):not(.past) {
-  background: transparent !important;
-  color: rgba(40, 5, 10, .42) !important;
-  border: 1px solid rgba(40, 5, 10, .28) !important;
-  opacity: 1 !important;
-}
-
-.herbag-time-scroll button:not(.selected):not(.booked):not(.past):hover {
-  color: #28050A !important;
-  border-color: #28050A !important;
-}
-
-.herbag-time-scroll button.selected:not(.booked):not(.past) {
-  background: transparent !important;
-  color: #28050A !important;
-  border: 1px solid #28050A !important;
-  opacity: 1 !important;
-}
-
-.herbag-time-scroll button.booked,
-.herbag-time-scroll button.past {
-  align-items: flex-start !important;
-  padding-top: 13px;
-  background: #eeeeee !important;
-  border-color: #cccccc !important;
-  color: #999999 !important;
-  cursor: not-allowed !important;
-  pointer-events: none !important;
-  opacity: .85 !important;
-}
-
-.herbag-time-scroll button.booked::after {
-  content: "Booked";
-  position: absolute;
-  left: 50%;
-  bottom: 8px;
-  transform: translateX(-50%);
-  font-size: .72em;
-  line-height: 1;
-  color: #999999;
-  text-transform: uppercase;
-}
-
-.herbag-time-scroll button.past::after {
-  content: "Passed";
-  position: absolute;
-  left: 50%;
-  bottom: 8px;
-  transform: translateX(-50%);
-  font-size: .72em;
-  line-height: 1;
-  color: #999999;
-  text-transform: uppercase;
-}
-
-.herbag-time-scroll::-webkit-scrollbar {
-  height: 4px;
-}
-
-.herbag-time-scroll::-webkit-scrollbar-thumb {
-  background: var(--herbag-brand);
-}
-
-.herbag-actions {
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-}
-
-.herbag-main-btn,
-.herbag-secondary-btn {
-  min-width: 170px;
-}
-
-.herbag-main-btn {
-  margin-left: auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.herbag-main-btn.disabled,
-.herbag-main-btn:disabled {
-  background: #bdb7b9 !important;
-  border-color: #bdb7b9 !important;
-  color: #ffffff !important;
-  opacity: 1 !important;
-  cursor: not-allowed !important;
-  pointer-events: none;
-}
-
-.herbag-main-btn.disabled span,
-.herbag-main-btn:disabled span {
-  color: #ffffff !important;
-}
-
-#herbagBookingMessage {
-  margin-top: 16px;
-}
-
-.herbag-confirmation-box {
-  text-align: center;
-  border: 1px solid currentColor;
-  padding: 50px 30px;
-}
-
-.herbag-confirmation-icon {
-  width: 46px;
-  height: 46px;
-  margin: 0 auto 18px;
-  border: 1px solid currentColor;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.herbag-confirmation-code {
-  margin: 18px auto;
-  padding: 14px 20px;
-  border: 1px solid currentColor;
-  display: inline-block;
-}
-
-@media (max-width: 768px) {
-  .herbag-steps {
-    display: none !important;
-  }
-
-  .herbag-service-list {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-
-  .herbag-service {
-    min-height: auto;
-    padding: 16px 18px;
-  }
-
-  .herbag-actions {
-    flex-direction: column;
-  }
-
-  .herbag-main-btn,
-  .herbag-secondary-btn {
-    width: 100%;
-  }
-
-  .herbag-time-scroll {
-    padding-bottom: 6px !important;
-  }
-
-  .herbag-time-scroll button {
-    flex-basis: 135px !important;
-    width: 135px !important;
-    min-width: 135px !important;
-    max-width: 135px !important;
-    height: 50px !important;
-    font-size: 13px;
-  }
-
-  .herbag-time-scroll button.booked,
-  .herbag-time-scroll button.past {
-    padding-top: 10px;
-  }
-
-  .herbag-time-scroll button.booked::after,
-  .herbag-time-scroll button.past::after {
-    bottom: 7px;
-  }
-}
-</style>
 
 <script>
 (function () {
@@ -945,4 +626,6 @@ if (isPast) {
   });
 })();
 </script>
-
+</main>
+</body>
+</html>
