@@ -1,224 +1,932 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Book an Appointment | HERBAG</title>
+<div class="herbag-booking-elegant">
+  <div class="herbag-booking-header">
+    <h2 class="h5">BOOK AN APPOINTMENT</h2>
 
-  <style>
-    *{box-sizing:border-box}
-    body{margin:0;background:#f7f7f5;color:#28050a;font-family:Arial,sans-serif}
-    header{padding:28px;text-align:center;border-bottom:1px solid #ddd;background:#fff}
-    header a{color:#28050a;text-decoration:none;font-size:24px;letter-spacing:.18em}
-    main{width:min(720px,100%);margin:auto;padding:44px 20px 70px}
-    h1{margin:0 0 10px;font-size:34px;font-weight:500}
-    .intro{margin:0 0 36px;color:#70676a;line-height:1.5}
-    .section{margin-bottom:38px}
-    .section-title{margin-bottom:16px;font-size:13px;letter-spacing:.12em;text-transform:uppercase}
-    .field-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-    input,textarea{width:100%;padding:16px;border:1px solid #cfc9ca;background:#fff;color:#28050a;font:inherit;border-radius:0}
-    input:focus,textarea:focus{outline:1px solid #28050a;border-color:#28050a}
-    textarea{min-height:120px;resize:vertical}
-    .times{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
-    .time{padding:14px 8px;border:1px solid #cfc9ca;background:transparent;color:#28050a;font:inherit;cursor:pointer}
-    .time.active{border-color:#28050a;outline:1px solid #28050a}
-    .time.booked{color:#aaa;background:#eee;border-color:#ddd;cursor:not-allowed;text-decoration:line-through}
-    .submit{width:100%;padding:18px;border:1px solid #28050a;background:#28050a;color:#fff;font:inherit;cursor:pointer}
-    .submit:disabled{opacity:.45;cursor:not-allowed}
-    .message{display:none;padding:22px;border:1px solid #28050a;text-align:center;line-height:1.6}
-    .error{margin-top:12px;color:#a00020}
-    @media(max-width:560px){
-      main{padding-top:32px}
-      h1{font-size:28px}
-      .field-grid{grid-template-columns:1fr}
-      .times{grid-template-columns:repeat(2,1fr)}
-    }
-  </style>
-</head>
+    <p class="body text-l">
+      Get an exclusive appointment-only experience with privacy, comfort, and personalized attention at our Lake View boutique.
+    </p>
 
-<body>
-  <header><a href="https://herbag.al">HERBAG</a></header>
+    <p class="body text-l herbag-booking-duration">
+      Each appointment lasts 45 minutes.
+    </p>
+  </div>
 
-  <main>
-    <h1>Book an Appointment</h1>
-    <p class="intro">Choose your preferred date and time. Our team will confirm your appointment by email.</p>
+  <div class="herbag-steps">
+    <div class="herbag-step active">
+      <span>1</span>
+      <p class="caption">Service</p>
+    </div>
+    <div class="herbag-step">
+      <span>2</span>
+      <p class="caption">Date & Time</p>
+    </div>
+    <div class="herbag-step">
+      <span>3</span>
+      <p class="caption">Details</p>
+    </div>
+  </div>
 
-    <form id="bookingForm">
-      <div class="section">
-        <div class="section-title">1. Date and time</div>
-        <input type="date" id="bookingDate" required>
+  <div class="herbag-step-panel active" id="herbagStep1">
+    <label class="herbag-label caption">Choose a Service</label>
 
-        <div class="times" id="times">
-          <button type="button" class="time">10:30</button>
-          <button type="button" class="time">11:15</button>
-          <button type="button" class="time">12:00</button>
-          <button type="button" class="time">12:45</button>
-          <button type="button" class="time">13:30</button>
-          <button type="button" class="time">14:15</button>
-          <button type="button" class="time">15:00</button>
-          <button type="button" class="time">15:45</button>
-          <button type="button" class="time">16:30</button>
-          <button type="button" class="time">17:15</button>
-          <button type="button" class="time">18:00</button>
-        </div>
+    <div class="herbag-service-list">
+      <button type="button" class="herbag-service selected" data-service="Sell a Bag">
+        <span>Sell a Bag</span>
+      </button>
+
+      <button type="button" class="herbag-service" data-service="Buy a Bag">
+        <span>Buy a Bag</span>
+      </button>
+
+      <button type="button" class="herbag-service" data-service="Rent a Bag">
+        <span>Rent a Bag</span>
+      </button>
+
+      <button type="button" class="herbag-service" data-service="Entrupy Authentication Service">
+        <span>Entrupy Authentication Service</span>
+      </button>
+    </div>
+
+    <button type="button" class="button button--primary herbag-main-btn" id="goStep2">
+      <span>Continue</span>
+    </button>
+  </div>
+
+  <div class="herbag-step-panel" id="herbagStep2">
+    <label class="herbag-label caption">Select Date & Time</label>
+
+    <input type="date" id="herbagDate" required>
+    <input type="hidden" id="herbagTime" required>
+
+    <div class="herbag-time-scroll" id="herbagTimeScroll"></div>
+
+    <div class="herbag-actions">
+      <button type="button" class="button button--secondary herbag-secondary-btn" data-back="1">
+        <span>Back</span>
+      </button>
+
+      <button type="button" class="button button--primary herbag-main-btn disabled" id="goStep3" disabled>
+        <span>Continue</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="herbag-step-panel" id="herbagStep3">
+    <form id="herbagBookingForm">
+      <input type="text" name="name" placeholder="Full name" required>
+      <input type="email" name="email" placeholder="Email" required>
+      <input type="tel" name="phone" placeholder="Phone number" required>
+      <textarea name="message" placeholder="Your message" rows="6"></textarea>
+
+      <div class="herbag-actions">
+        <button type="button" class="button button--secondary herbag-secondary-btn" data-back="2">
+          <span>Back</span>
+        </button>
+
+        <button type="submit" class="button button--primary herbag-main-btn">
+          <span>Book Appointment</span>
+        </button>
       </div>
 
-      <div class="section">
-        <div class="section-title">2. Your details</div>
-
-        <div class="field-grid">
-          <input name="first_name" placeholder="First name" required>
-          <input name="last_name" placeholder="Last name" required>
-          <input name="phone" type="tel" placeholder="Phone" required>
-          <input name="email" type="email" placeholder="Email" required>
-        </div>
-
-        <input
-          name="product"
-          id="product"
-          placeholder="Product or bag of interest"
-          style="margin-top:14px"
-        >
-
-        <textarea name="notes" placeholder="Notes" style="margin-top:14px"></textarea>
-      </div>
-
-      <button class="submit" id="submitButton" type="submit">Confirm Booking</button>
-      <div class="error" id="error"></div>
+      <div id="herbagBookingMessage"></div>
     </form>
+  </div>
+</div>
 
-    <div class="message" id="confirmation"></div>
-  </main>
+<style>
+.herbag-booking-elegant {
+  --herbag-brand: #28050A;
+  --herbag-brand-rgb: 40, 5, 10;
+  max-width: 980px;
+  margin: 70px auto;
+  padding: 0 20px;
+  font-family: inherit;
+  color: inherit;
+}
 
-  <script>
-    const form = document.getElementById('bookingForm');
-    const dateInput = document.getElementById('bookingDate');
-    const timeButtons = document.querySelectorAll('.time');
-    const submitButton = document.getElementById('submitButton');
-    const errorBox = document.getElementById('error');
-    let selectedTime = '';
+.herbag-booking-header {
+  text-align: center;
+  margin-bottom: 34px;
+}
 
-    const today = new Date();
-    const localToday =
-      today.getFullYear() + '-' +
-      String(today.getMonth() + 1).padStart(2, '0') + '-' +
-      String(today.getDate()).padStart(2, '0');
+.herbag-booking-header h2 {
+  margin: 0 0 12px;
+}
 
-    dateInput.min = localToday;
-    dateInput.value = localToday;
+.herbag-booking-header p {
+  margin: 0;
+  opacity: 1;
+  color: inherit;
+}
 
-    const params = new URLSearchParams(window.location.search);
-    document.getElementById('product').value = params.get('product') || '';
+.herbag-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 34px;
+}
 
-    function generateCode() {
-      return 'HB' + Date.now().toString().slice(-8) +
-        Math.random().toString(36).slice(2, 6).toUpperCase();
-    }
+.herbag-step {
+  border: 1px solid rgba(var(--herbag-brand-rgb), .28) !important;
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  color: rgba(var(--herbag-brand-rgb), .42) !important;
+  background: transparent !important;
+  opacity: 1 !important;
+}
 
-    async function loadBookedSlots() {
-      selectedTime = '';
+.herbag-step.active {
+  border: 1px solid var(--herbag-brand) !important;
+  color: var(--herbag-brand) !important;
+  background: transparent !important;
+}
 
-      timeButtons.forEach(button => {
-        button.classList.remove('active', 'booked');
-        button.disabled = false;
-      });
+.herbag-step span {
+  width: 28px;
+  height: 28px;
+  background: rgba(var(--herbag-brand-rgb), .04) !important;
+  color: rgba(var(--herbag-brand-rgb), .42) !important;
+  border: 1px solid rgba(var(--herbag-brand-rgb), .16) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-      if (!dateInput.value) return;
+.herbag-step.active span {
+  background: transparent !important;
+  color: var(--herbag-brand) !important;
+  border: 1px solid var(--herbag-brand) !important;
+}
 
-      const selectedDate = new Date(dateInput.value + 'T12:00:00');
+.herbag-step p {
+  margin: 0;
+  color: inherit !important;
+}
 
-      if (selectedDate.getDay() === 0) {
-        errorBox.textContent = 'Sunday is closed. Please select another date.';
-        dateInput.value = '';
-        return;
+.herbag-step-panel {
+  display: none;
+}
+
+.herbag-step-panel.active {
+  display: block;
+}
+
+.herbag-label {
+  display: block;
+  margin-bottom: 16px;
+}
+
+.herbag-service-list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.herbag-service {
+  min-height: 92px;
+  padding: 16px 18px;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-family: inherit;
+  background: transparent !important;
+  color: rgba(var(--herbag-brand-rgb), .42) !important;
+  border: 1px solid rgba(var(--herbag-brand-rgb), .28) !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+}
+
+.herbag-service span {
+  color: inherit !important;
+  opacity: 1 !important;
+}
+
+.herbag-service.selected {
+  background: transparent !important;
+  color: var(--herbag-brand) !important;
+  border: 1px solid var(--herbag-brand) !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+}
+
+.herbag-service.selected span {
+  color: var(--herbag-brand) !important;
+}
+
+.herbag-step-panel input,
+.herbag-step-panel textarea {
+  width: 100%;
+  border: 1px solid currentColor;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+  font-family: inherit;
+  background: transparent;
+  color: inherit;
+}
+
+.herbag-time-scroll {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  gap: 12px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  padding-bottom: 12px !important;
+  margin-bottom: 24px !important;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+.herbag-time-scroll button {
+  position: relative;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 0 0 170px !important;
+  width: 170px !important;
+  min-width: 170px !important;
+  max-width: 170px !important;
+  height: 54px !important;
+  margin: 0 !important;
+  border: 1px solid currentColor;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.herbag-time-scroll button:not(.selected):not(.booked):not(.past) {
+  background: transparent !important;
+  color: rgba(40, 5, 10, .42) !important;
+  border: 1px solid rgba(40, 5, 10, .28) !important;
+  opacity: 1 !important;
+}
+
+.herbag-time-scroll button:not(.selected):not(.booked):not(.past):hover {
+  color: #28050A !important;
+  border-color: #28050A !important;
+}
+
+.herbag-time-scroll button.selected:not(.booked):not(.past) {
+  background: transparent !important;
+  color: #28050A !important;
+  border: 1px solid #28050A !important;
+  opacity: 1 !important;
+}
+
+.herbag-time-scroll button.booked,
+.herbag-time-scroll button.past {
+  align-items: flex-start !important;
+  padding-top: 13px;
+  background: #eeeeee !important;
+  border-color: #cccccc !important;
+  color: #999999 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+  opacity: .85 !important;
+}
+
+.herbag-time-scroll button.booked::after {
+  content: "Booked";
+  position: absolute;
+  left: 50%;
+  bottom: 8px;
+  transform: translateX(-50%);
+  font-size: .72em;
+  line-height: 1;
+  color: #999999;
+  text-transform: uppercase;
+}
+
+.herbag-time-scroll button.past::after {
+  content: "Passed";
+  position: absolute;
+  left: 50%;
+  bottom: 8px;
+  transform: translateX(-50%);
+  font-size: .72em;
+  line-height: 1;
+  color: #999999;
+  text-transform: uppercase;
+}
+
+.herbag-time-scroll::-webkit-scrollbar {
+  height: 4px;
+}
+
+.herbag-time-scroll::-webkit-scrollbar-thumb {
+  background: var(--herbag-brand);
+}
+
+.herbag-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.herbag-main-btn,
+.herbag-secondary-btn {
+  min-width: 170px;
+}
+
+.herbag-main-btn {
+  margin-left: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.herbag-main-btn.disabled,
+.herbag-main-btn:disabled {
+  background: #bdb7b9 !important;
+  border-color: #bdb7b9 !important;
+  color: #ffffff !important;
+  opacity: 1 !important;
+  cursor: not-allowed !important;
+  pointer-events: none;
+}
+
+.herbag-main-btn.disabled span,
+.herbag-main-btn:disabled span {
+  color: #ffffff !important;
+}
+
+#herbagBookingMessage {
+  margin-top: 16px;
+}
+
+.herbag-confirmation-box {
+  text-align: center;
+  border: 1px solid currentColor;
+  padding: 50px 30px;
+}
+
+.herbag-confirmation-icon {
+  width: 46px;
+  height: 46px;
+  margin: 0 auto 18px;
+  border: 1px solid currentColor;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.herbag-confirmation-code {
+  margin: 18px auto;
+  padding: 14px 20px;
+  border: 1px solid currentColor;
+  display: inline-block;
+}
+
+@media (max-width: 768px) {
+  .herbag-steps {
+    display: none !important;
+  }
+
+  .herbag-service-list {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .herbag-service {
+    min-height: auto;
+    padding: 16px 18px;
+  }
+
+  .herbag-actions {
+    flex-direction: column;
+  }
+
+  .herbag-main-btn,
+  .herbag-secondary-btn {
+    width: 100%;
+  }
+
+  .herbag-time-scroll {
+    padding-bottom: 6px !important;
+  }
+
+  .herbag-time-scroll button {
+    flex-basis: 135px !important;
+    width: 135px !important;
+    min-width: 135px !important;
+    max-width: 135px !important;
+    height: 50px !important;
+    font-size: 13px;
+  }
+
+  .herbag-time-scroll button.booked,
+  .herbag-time-scroll button.past {
+    padding-top: 10px;
+  }
+
+  .herbag-time-scroll button.booked::after,
+  .herbag-time-scroll button.past::after {
+    bottom: 7px;
+  }
+}
+</style>
+
+<script>
+(function () {
+  function initHerbagBookingForms(container) {
+    const scope = container || document;
+
+    scope.querySelectorAll(".herbag-booking-elegant").forEach(function (booking) {
+      if (booking.dataset.herbagInitialized === "true") return;
+      booking.dataset.herbagInitialized = "true";
+
+      let herbagSelectedService = "Sell a Bag";
+
+      const dateInput = booking.querySelector("#herbagDate");
+      const timeInput = booking.querySelector("#herbagTime");
+      const timeScroll = booking.querySelector("#herbagTimeScroll");
+      const goStep2 = booking.querySelector("#goStep2");
+      const goStep3 = booking.querySelector("#goStep3");
+      const form = booking.querySelector("#herbagBookingForm");
+      const messageBox = booking.querySelector("#herbagBookingMessage");
+
+      const herbagTimes = [
+        "10:30",
+        "11:15",
+        "12:00",
+        "12:45",
+        "13:30",
+        "14:15",
+        "15:00",
+        "15:45",
+        "16:30",
+        "17:15",
+        "18:00"
+      ];
+
+      function formatLocalDate(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+
+        return year + "-" + month + "-" + day;
       }
 
-      errorBox.textContent = '';
+      function getDayFromDateValue(dateValue) {
+        const parts = String(dateValue || "").split("-");
 
-      try {
-        const response = await fetch(
-          '/api/booked-slots?date=' + encodeURIComponent(dateInput.value)
-        );
+        if (parts.length !== 3) return null;
 
-        const data = await response.json();
-        const bookedTimes = data.booked_times || [];
+        return new Date(
+          Number(parts[0]),
+          Number(parts[1]) - 1,
+          Number(parts[2])
+        ).getDay();
+      }
 
-        timeButtons.forEach(button => {
-          if (bookedTimes.includes(button.textContent.trim())) {
-            button.classList.add('booked');
-            button.disabled = true;
+      function getDefaultBookingDate() {
+        const date = new Date();
+
+        if (date.getDay() === 0) {
+          date.setDate(date.getDate() + 1);
+        }
+
+        return date;
+      }
+
+      function getTimeMinutes(value) {
+        const match = String(value || "").match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
+
+        if (!match) return null;
+
+        let hour = Number(match[1]);
+        const minute = Number(match[2]);
+        const meridiem = match[3] ? match[3].toUpperCase() : "";
+
+        if (meridiem === "PM" && hour < 12) hour += 12;
+        if (meridiem === "AM" && hour === 12) hour = 0;
+
+        return hour * 60 + minute;
+      }
+
+      function isPastTimeSlot(dateValue, timeValue) {
+        if (!dateValue || !timeValue) return false;
+
+        const todayValue = formatLocalDate(new Date());
+
+        if (dateValue < todayValue) return true;
+        if (dateValue > todayValue) return false;
+
+        const now = new Date();
+        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+        const slotMinutes = getTimeMinutes(timeValue);
+
+        return slotMinutes !== null && slotMinutes <= currentMinutes;
+      }
+
+      function clearTimeSelection() {
+        if (timeInput) {
+          timeInput.value = "";
+        }
+
+        if (timeScroll) {
+          timeScroll.querySelectorAll("button").forEach(function (button) {
+            button.classList.remove("selected");
+          });
+        }
+      }
+
+      function validateStep2() {
+        if (!goStep3 || !dateInput || !timeInput) return;
+
+        const selectedButton = timeScroll
+          ? timeScroll.querySelector("button.selected")
+          : null;
+
+        const isValid =
+          dateInput.value &&
+          timeInput.value &&
+          selectedButton &&
+          !selectedButton.classList.contains("booked") &&
+          !selectedButton.classList.contains("past") &&
+          !isPastTimeSlot(dateInput.value, timeInput.value);
+
+        if (isValid) {
+          goStep3.classList.remove("disabled");
+          goStep3.disabled = false;
+        } else {
+          goStep3.classList.add("disabled");
+          goStep3.disabled = true;
+        }
+      }
+
+      function updatePastTimeSlots() {
+        if (!dateInput || !timeScroll) return;
+
+        const selectedDate = dateInput.value;
+
+        timeScroll.querySelectorAll("button").forEach(function (button) {
+          const isBooked = button.classList.contains("booked");
+          const isPast = !isBooked && isPastTimeSlot(selectedDate, button.dataset.time);
+
+          button.classList.toggle("past", isPast);
+          button.disabled = isBooked || isPast;
+
+          if ((isBooked || isPast) && button.classList.contains("selected")) {
+            button.classList.remove("selected");
+
+            if (timeInput) {
+              timeInput.value = "";
+            }
           }
         });
-      } catch (error) {
-        errorBox.textContent = 'Could not load the available times.';
-      }
-    }
 
-    timeButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        timeButtons.forEach(item => item.classList.remove('active'));
-        button.classList.add('active');
-        selectedTime = button.textContent.trim();
-      });
-    });
-
-    dateInput.addEventListener('change', loadBookedSlots);
-    loadBookedSlots();
-
-    form.addEventListener('submit', async event => {
-      event.preventDefault();
-      errorBox.textContent = '';
-
-      if (!selectedTime) {
-        errorBox.textContent = 'Please select an appointment time.';
-        return;
+        validateStep2();
       }
 
-      submitButton.disabled = true;
-      submitButton.textContent = 'Processing...';
+      async function loadBookedSlots(date) {
+        if (!date || !timeScroll) return;
 
-      const data = new FormData(form);
-      const code = generateCode();
-      const product = data.get('product') || 'Instagram appointment';
+        try {
+          const response = await fetch(
+            "https://project-ghud3.vercel.app/api/booked-slots?date=" + encodeURIComponent(date)
+          );
 
-      try {
-        const response = await fetch('/api/create-booking', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({
-            first_name: data.get('first_name'),
-            last_name: data.get('last_name'),
-            phone: data.get('phone'),
-            email: data.get('email'),
-            notes: data.get('notes'),
-            selected_date: dateInput.value,
-            selected_time: selectedTime,
-            product: product,
-            product_url: params.get('product_url') || 'https://herbag.al',
-            product_image: '',
-            product_description: 'Booking received from Instagram',
-            confirmation_code: code,
-            source: 'instagram'
-          })
+          const data = await response.json();
+          const bookedTimes = data.booked_times || [];
+
+          timeScroll.querySelectorAll("button").forEach(function (button) {
+            const slotTime = button.dataset.time;
+            const isBooked = bookedTimes.includes(slotTime);
+
+            button.classList.toggle("booked", isBooked);
+
+            if (isBooked && button.classList.contains("selected")) {
+              button.classList.remove("selected");
+
+              if (timeInput) {
+                timeInput.value = "";
+              }
+            }
+          });
+
+          updatePastTimeSlots();
+          validateStep2();
+        } catch (error) {
+          console.error("Could not load booked slots", error);
+          updatePastTimeSlots();
+          validateStep2();
+        }
+      }
+
+      async function prepareDateStep() {
+        if (!dateInput) return;
+
+        const todayValue = formatLocalDate(new Date());
+
+        dateInput.min = todayValue;
+
+        if (!dateInput.value || dateInput.value < todayValue) {
+          dateInput.value = formatLocalDate(getDefaultBookingDate());
+        }
+
+        clearTimeSelection();
+
+        if (timeScroll) {
+          timeScroll.querySelectorAll("button").forEach(function (button) {
+            button.classList.remove("booked");
+            button.classList.remove("past");
+            button.disabled = false;
+          });
+        }
+
+        await loadBookedSlots(dateInput.value);
+        updatePastTimeSlots();
+        validateStep2();
+      }
+
+      if (timeScroll) {
+        timeScroll.innerHTML = herbagTimes.map(function (time) {
+          return '<button type="button" data-time="' + time + '">' + time + '</button>';
+        }).join("");
+
+        timeScroll.addEventListener("click", function (event) {
+          const button = event.target.closest("button");
+
+          if (
+            !button ||
+            button.classList.contains("booked") ||
+            button.classList.contains("past") ||
+            button.disabled
+          ) {
+            return;
+          }
+
+          timeScroll.querySelectorAll("button").forEach(function (btn) {
+            btn.classList.remove("selected");
+          });
+
+          button.classList.add("selected");
+
+          if (timeInput) {
+            timeInput.value = button.dataset.time;
+          }
+
+          updatePastTimeSlots();
+          validateStep2();
+        });
+      }
+
+      function herbagGoToStep(step) {
+        booking.querySelectorAll(".herbag-step-panel").forEach(function (panel) {
+          panel.classList.remove("active");
         });
 
-        if (!response.ok) throw new Error(await response.text());
+        const nextPanel = booking.querySelector("#herbagStep" + step);
+        if (nextPanel) nextPanel.classList.add("active");
 
-        form.style.display = 'none';
-
-        const confirmation = document.getElementById('confirmation');
-        confirmation.style.display = 'block';
-        confirmation.innerHTML =
-          '<strong>Appointment request received</strong><br><br>' +
-          'Confirmation code: <strong>' + code + '</strong><br>' +
-          dateInput.value + ' at ' + selectedTime +
-          '<br><br>A confirmation email has been sent to you.';
-      } catch (error) {
-        errorBox.textContent = 'Something went wrong. Please try again.';
-        submitButton.disabled = false;
-        submitButton.textContent = 'Confirm Booking';
+        booking.querySelectorAll(".herbag-step").forEach(function (item, index) {
+          item.classList.toggle("active", index <= step - 1);
+        });
       }
+
+      booking.querySelectorAll(".herbag-service").forEach(function (item) {
+        item.addEventListener("click", function () {
+          booking.querySelectorAll(".herbag-service").forEach(function (el) {
+            el.classList.remove("selected");
+          });
+
+          item.classList.add("selected");
+          herbagSelectedService = item.dataset.service;
+        });
+      });
+
+      if (goStep2) {
+        goStep2.addEventListener("click", async function () {
+          const buttonText = goStep2.querySelector("span");
+
+          if (buttonText) {
+            buttonText.innerText = "Loading...";
+          }
+
+          await prepareDateStep();
+
+          if (buttonText) {
+            buttonText.innerText = "Continue";
+          }
+
+          herbagGoToStep(2);
+          updatePastTimeSlots();
+          validateStep2();
+        });
+      }
+
+      if (goStep3) {
+        goStep3.disabled = true;
+        goStep3.classList.add("disabled");
+
+        goStep3.addEventListener("click", function () {
+          updatePastTimeSlots();
+
+          if (!dateInput || !dateInput.value || !timeInput || !timeInput.value) {
+            validateStep2();
+            return;
+          }
+
+          if (isPastTimeSlot(dateInput.value, timeInput.value)) {
+            alert("Please select a future time.");
+            clearTimeSelection();
+            updatePastTimeSlots();
+            validateStep2();
+            return;
+          }
+
+          herbagGoToStep(3);
+        });
+      }
+
+      booking.querySelectorAll(".herbag-secondary-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          herbagGoToStep(btn.dataset.back);
+        });
+      });
+
+      if (dateInput) {
+        dateInput.min = formatLocalDate(new Date());
+
+        dateInput.addEventListener("click", function () {
+          if (dateInput.showPicker) dateInput.showPicker();
+        });
+
+        dateInput.addEventListener("change", async function () {
+          const todayValue = formatLocalDate(new Date());
+
+          if (this.value < todayValue) {
+            alert("Please select today or a future date.");
+            this.value = "";
+
+            clearTimeSelection();
+
+            if (timeScroll) {
+              timeScroll.querySelectorAll("button").forEach(function (button) {
+                button.classList.remove("booked");
+                button.classList.remove("past");
+                button.disabled = false;
+              });
+            }
+
+            validateStep2();
+            return;
+          }
+
+          if (getDayFromDateValue(this.value) === 0) {
+            alert("Sunday is closed. Please select another date.");
+            this.value = "";
+
+            clearTimeSelection();
+
+            if (timeScroll) {
+              timeScroll.querySelectorAll("button").forEach(function (button) {
+                button.classList.remove("booked");
+                button.classList.remove("past");
+                button.disabled = false;
+              });
+            }
+
+            validateStep2();
+            return;
+          }
+
+          clearTimeSelection();
+
+          if (timeScroll) {
+            timeScroll.querySelectorAll("button").forEach(function (button) {
+              button.classList.remove("booked");
+              button.classList.remove("past");
+              button.disabled = false;
+            });
+          }
+
+          await loadBookedSlots(this.value);
+          updatePastTimeSlots();
+          validateStep2();
+        });
+      }
+
+      function generateBookingCode() {
+        const now = new Date();
+
+        const datePart =
+          String(now.getFullYear()).slice(2) +
+          String(now.getMonth() + 1).padStart(2, "0") +
+          String(now.getDate()).padStart(2, "0") +
+          String(now.getHours()).padStart(2, "0") +
+          String(now.getMinutes()).padStart(2, "0");
+
+        const randomPart = Math.random().toString(36).substring(2, 6).toUpperCase();
+
+        return "HB" + datePart + randomPart;
+      }
+
+      if (form) {
+        form.addEventListener("submit", async function (event) {
+          event.preventDefault();
+
+          const submitBtn = form.querySelector('button[type="submit"]');
+          const fullName = form.name.value.trim();
+          const nameParts = fullName.split(" ");
+          const firstName = nameParts[0] || "";
+          const lastName = nameParts.slice(1).join(" ") || "-";
+          const code = generateBookingCode();
+
+          updatePastTimeSlots();
+
+          if (isPastTimeSlot(dateInput.value, timeInput.value)) {
+            messageBox.innerHTML = "Please select a future time.";
+            clearTimeSelection();
+            updatePastTimeSlots();
+            validateStep2();
+            return;
+          }
+
+          const data = {
+            first_name: firstName,
+            last_name: lastName,
+            email: form.email.value,
+            phone: form.phone.value,
+            notes: form.message.value,
+            selected_date: dateInput.value,
+            selected_time: timeInput.value,
+            product: herbagSelectedService,
+            product_url: window.location.href,
+            product_image: "",
+            product_description: "Appointment service: " + herbagSelectedService,
+            confirmation_code: code
+          };
+
+          submitBtn.disabled = true;
+          submitBtn.querySelector("span").innerText = "Sending...";
+          messageBox.innerHTML = "";
+
+          try {
+            const response = await fetch("https://project-ghud3.vercel.app/api/create-booking", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify(data)
+            });
+
+            if (!response.ok) {
+              throw new Error(await response.text());
+            }
+
+            booking.querySelector("#herbagStep3").innerHTML = `
+              <div class="herbag-confirmation-box">
+                <div class="herbag-confirmation-icon">✓</div>
+                <h3 class="h3">Appointment Request Received</h3>
+                <div class="herbag-confirmation-code">${code}</div>
+                <p>Thank you ${firstName}, your appointment request has been received.</p>
+                <div>${herbagSelectedService} · ${dateInput.value} · ${timeInput.value}</div>
+              </div>
+            `;
+
+            herbagGoToStep(3);
+          } catch (error) {
+            console.error(error);
+
+            messageBox.innerHTML = "Something went wrong. Please try again.";
+
+            submitBtn.disabled = false;
+            submitBtn.querySelector("span").innerText = "Book Appointment";
+          }
+        });
+      }
+
+      setInterval(function () {
+        updatePastTimeSlots();
+      }, 60000);
+
+      validateStep2();
     });
-  </script>
-</body>
-</html>
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", function () {
+      initHerbagBookingForms(document);
+    });
+  } else {
+    initHerbagBookingForms(document);
+  }
+
+  document.addEventListener("shopify:section:load", function (event) {
+    initHerbagBookingForms(event.target);
+  });
+})();
+</script>
