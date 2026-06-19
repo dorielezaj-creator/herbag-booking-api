@@ -84,3 +84,104 @@ textarea {
   flex: 0 0 36px;
 }
 .herbag-label {
+
+
+  /* HERBAG standalone header */
+.herbag-standalone-header {
+  display: grid;
+  grid-template-columns: 48px 1fr 48px;
+  align-items: center;
+  width: 100%;
+  min-height: 150px;
+  padding: 28px 36px;
+  background: #fff;
+}
+
+.herbag-header-logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.herbag-header-logo img {
+  display: block;
+  width: 72px;
+  height: auto;
+}
+
+.herbag-header-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  color: #28050a;
+}
+
+.herbag-header-account {
+  justify-self: end;
+}
+
+.herbag-header-icon svg {
+  width: 30px;
+  height: 30px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Hide old CSS logo */
+.herbag-booking-elegant::before {
+  display: none !important;
+}
+
+/* Main Continue button */
+.herbag-booking-elegant #goStep2.button.button--primary {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  min-width: 100% !important;
+  height: 92px !important;
+  margin: 56px 0 0 !important;
+  padding: 0 30px !important;
+  border: 1px solid #28050a !important;
+  border-radius: 0 !important;
+  background: #28050a !important;
+  color: #fff !important;
+  font-family: "Josefin Sans", Arial, sans-serif !important;
+  font-size: 24px !important;
+  font-weight: 400 !important;
+  line-height: 1 !important;
+  box-shadow: none !important;
+  cursor: pointer !important;
+}
+
+.herbag-booking-elegant #goStep2.button.button--primary span {
+  color: #fff !important;
+  font: inherit !important;
+}
+
+@media (max-width: 768px) {
+  .herbag-standalone-header {
+    min-height: 110px;
+    padding: 20px 24px;
+  }
+
+  .herbag-header-logo img {
+    width: 58px;
+  }
+
+  .herbag-header-icon svg {
+    width: 26px;
+    height: 26px;
+  }
+
+  .herbag-booking-elegant #goStep2.button.button--primary {
+    height: 72px !important;
+    margin-top: 38px !important;
+    font-size: 20px !important;
+  }
+}
