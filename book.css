@@ -1,0 +1,86 @@
+@import url("https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;500;600&display=swap");
+:root {
+  --herbag-brand: #28050a;
+  --herbag-brand-rgb: 40, 5, 10;
+}
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  min-width: 320px;
+  background: #fff;
+  color: var(--herbag-brand);
+  font-family: "Josefin Sans", Arial, sans-serif !important;
+  -webkit-font-smoothing: antialiased;
+}
+button,
+input,
+textarea {
+  border-radius: 0 !important;
+  font-family: inherit !important;
+  letter-spacing: 0;
+}
+.herbag-booking-elegant {
+  width: min(1240px, 100%) !important;
+  max-width: 1240px !important;
+  margin: 0 auto !important;
+  padding: 48px 40px 90px !important;
+  color: var(--herbag-brand) !important;
+  font-family: "Josefin Sans", Arial, sans-serif !important;
+}
+.herbag-booking-elegant::before {
+  content: "";
+  display: block;
+  width: 58px;
+  height: 48px;
+  margin: 0 auto 52px;
+  background: url("https://herbag.al/cdn/shop/files/herbag_icon_29272342-eddb-4b08-886d-5b126b09334a.svg?v=1778229865&width=200") center / contain no-repeat;
+}
+.herbag-booking-header {
+  max-width: 1080px;
+  margin: 0 auto 50px !important;
+  text-align: center;
+}
+.herbag-booking-header h2,
+.herbag-confirmation-box h3 {
+  margin: 0 0 20px !important;
+  color: var(--herbag-brand) !important;
+  font-family: inherit !important;
+  font-size: clamp(32px, 4vw, 48px) !important;
+  font-weight: 400 !important;
+  line-height: 1.08 !important;
+  letter-spacing: .03em !important;
+  text-transform: uppercase;
+}
+.herbag-booking-header p {
+  margin: 0 !important;
+  color: var(--herbag-brand) !important;
+  font-family: inherit !important;
+  font-size: clamp(17px, 1.8vw, 20px) !important;
+  line-height: 1.5 !important;
+}
+.herbag-step p,
+.herbag-label {
+  font-family: inherit !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  letter-spacing: .08em !important;
+  text-transform: uppercase;
+}
+.herbag-steps {
+  gap: 18px !important;
+  margin-bottom: 50px !important;
+}
+.herbag-step {
+  min-height: 82px !important;
+  gap: 18px !important;
+  padding: 0 24px !important;
+}
+.herbag-step span {
+  width: 36px !important;
+  height: 36px !important;
+  flex: 0 0 36px;
+}
+.herbag-label {
