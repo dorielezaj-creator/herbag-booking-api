@@ -94,6 +94,12 @@
 </div>
 
 <style>
+.herbag-time-scroll button.past{
+  display:none !important;
+}
+
+
+
 .herbag-booking-elegant {
   --herbag-brand: #28050A;
   --herbag-brand-rgb: 40, 5, 10;
@@ -576,7 +582,14 @@
           const isPast = !isBooked && isPastTimeSlot(selectedDate, button.dataset.time);
 
           button.classList.toggle("past", isPast);
-          button.disabled = isBooked || isPast;
+button.disabled = isBooked || isPast;
+
+/* hide passed slots */
+if (isPast) {
+  button.style.display = "none";
+} else {
+  button.style.display = "";
+}
 
           if ((isBooked || isPast) && button.classList.contains("selected")) {
             button.classList.remove("selected");
@@ -930,3 +943,4 @@
   });
 })();
 </script>
+
