@@ -1,1 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Book an Appointment | HERBAG</title>
 
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;background:#f7f7f5;color:#28050a;font-family:Arial,sans-serif}
+    header{padding:28px;text-align:center;border-bottom:1px solid #ddd;background:#fff}
+    header a{color:#28050a;text-decoration:none;font-size:24px;letter-spacing:.18em}
+    main{width:min(720px,100%);margin:auto;padding:44px 20px 70px}
+    h1{margin:0 0 10px;font-size:34px;font-weight:500}
+    .intro{margin:0 0 36px;color:#70676a;line-height:1.5}
+    .section{margin-bottom:38px}
+    .section-title{margin-bottom:16px;font-size:13px;letter-spacing:.12em;text-transform:uppercase}
+    .field-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    input,textarea{width:100%;padding:16px;border:1px solid #cfc9ca;background:#fff;color:#28050a;font:inherit;border-radius:0}
+    input:focus,textarea:focus{outline:1px solid #28050a;border-color:#28050a}
+    textarea{min-height:120px;resize:vertical}
+    .times{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
+    .time{padding:14px 8px;border:1px solid #cfc9ca;background:transparent;color:#28050a;font:inherit;cursor:pointer}
+    .time.active{border-color:#28050a;outline:1px solid #28050a}
+    .time.booked{color:#aaa;background:#eee;border-color:#ddd;cursor:not-allowed;text-decoration:line-through}
+    .submit{width:100%;padding:18px;border:1px solid #28050a;background:#28050a;color:#fff;font:inherit;cursor:pointer}
+    .submit:disabled{opacity:.45;cursor:not-allowed}
+    .message{display:none;padding:22px;border:1px solid #28050a;text-align:center;line-height:1.6}
+    .error{margin-top:12px;color:#a00020}
+    @media(max-width:560px){
+      main{padding-top:32px}
+      h1{font-size:28px}
+      .field-grid{grid-template-columns:1fr}
+      .times{grid-template-columns:repeat(2,1fr)}
+    }
+  </style>
+</head>
+
+<body>
+  <header><a href="https://herbag.al">HERBAG</a></header>
+
+  <main>
+    <h1>Book an Appointment</h1>
+    <p class="intro">Choose your preferred date and time. Our team will confirm your appointment by email.</p>
+
+    <form id="bookingForm">
+      <div class="section">
+        <div class="section-title">1. Date and time</div>
+        <input type="date" id="bookingDate" required>
+
+        <div class="times" id="times">
+          <button type="button" class="time">10:30</button>
+          <button type="button" class="time">11:15</button>
+          <button type="button" class="time">12:00</button>
+          <button type="button" class="time">12:45</button>
+          <button type="button" class="time">13:30</button>
+          <button type="button" class="time">14:15</button>
+          <button type="button" class="time">15:00</button>
+          <button type="button" class="time">15:45</button>
+          <button type="button" class="time">16:30</button>
+          <button type="button" class="time">17:15</button>
+          <button type="button" class="time">18:00</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">2. Your details</div>
+
+        <div class="field-grid">
+          <input name="first_name" placeholder="First name" required>
+          <input name="last_name" placeholder="Last name" required>
+          <input name="phone" type="tel" placeholder="Phone" required>
+          <input name="email" type="email" placeholder="Email" required>
+        </div>
+
+        <input
+          name="product"
+          id="product"
+          placeholder="Product or bag of interest"
+          style="margin-top:14px"
+        >
+
+        <textarea name="notes" placeholder="Notes" style="margin-top:14px"></textarea>
+      </div>
+
+      <button class="submit" id="submitButton" type="submit">Confirm Booking</button>
+      <div class="error" id="error"></div>
+    </form>
+
+    <div class="message" id="confirmation"></div>
+  </main>
+
+  <script>
+    const form = document.getElementById('bookingForm');
+    const dateInput = document.getElementById('bookingDate');
+    const timeButtons = document.querySelectorAll('.time');
+    const submitButton = document.getElementById('submitButton');
+    const errorBox = document.getElementById('error');
+    let selectedTime = '';
+
+    const today = new Date();
+    const localToday =
+      today.getFullYear() + '-' +
+      String(today.getMonth() + 1).padStart(2, '0') + '-' +
+      String(today.getDate()).padStart(2, '0');
+
+    dateInput.min = localToday;
+    dateInput.value = localToday;
+
+    const params = new URLSearchParams(window.location.search);
+    document.getElementById('product').value = params.get('product') || '';
+
+    function generateCode() {
+      return 'HB' + Date.now().toString().slice(-8) +
+        Math.random().toString(36).slice(2, 6).toUpperCase();
+    }
+
+    async function loadBookedSlots() {
+      selectedTime = '';
+
+      timeButtons.forEach(button => {
+        button.classList.remove('active', 'booked');
+        button.disabled = false;
+      });
+
+      if (!dateInput.value) return;
+
+      const selectedDate = new Date(dateInput.value + 'T12:00:00');
+
+      if (selectedDate.getDay() === 0) {
+        errorBox.textContent = 'Sunday is closed. Please select another date.';
+        dateInput.value = '';
+        return;
+      }
+
+      errorBox.textContent = '';
+
+      try {
+        const response = await fetch(
+          '/api/booked-slots?date=' + encodeURIComponent(dateInput.value)
+        );
+
+        const data = await response.json();
+        const bookedTimes = data.booked_times || [];
+
+        timeButtons.forEach(button => {
+          if (bookedTimes.includes(button.textContent.trim())) {
+            button.classList.add('booked');
+            button.disabled = true;
+          }
+        });
+      } catch (error) {
+        errorBox.textContent = 'Could not load the available times.';
+      }
+    }
+
+    timeButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        timeButtons.forEach(item => item.classList.remove('active'));
+        button.classList.add('active');
+        selectedTime = button.textContent.trim();
+      });
+    });
+
+    dateInput.addEventListener('change', loadBookedSlots);
+    loadBookedSlots();
+
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+      errorBox.textContent = '';
+
+      if (!selectedTime) {
+        errorBox.textContent = 'Please select an appointment time.';
+        return;
+      }
+
+      submitButton.disabled = true;
+      submitButton.textContent = 'Processing...';
+
+      const data = new FormData(form);
+      const code = generateCode();
+      const product = data.get('product') || 'Instagram appointment';
+
+      try {
+        const response = await fetch('/api/create-booking', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            first_name: data.get('first_name'),
+            last_name: data.get('last_name'),
+            phone: data.get('phone'),
+            email: data.get('email'),
+            notes: data.get('notes'),
+            selected_date: dateInput.value,
+            selected_time: selectedTime,
+            product: product,
+            product_url: params.get('product_url') || 'https://herbag.al',
+            product_image: '',
+            product_description: 'Booking received from Instagram',
+            confirmation_code: code,
+            source: 'instagram'
+          })
+        });
+
+        if (!response.ok) throw new Error(await response.text());
+
+        form.style.display = 'none';
+
+        const confirmation = document.getElementById('confirmation');
+        confirmation.style.display = 'block';
+        confirmation.innerHTML =
+          '<strong>Appointment request received</strong><br><br>' +
+          'Confirmation code: <strong>' + code + '</strong><br>' +
+          dateInput.value + ' at ' + selectedTime +
+          '<br><br>A confirmation email has been sent to you.';
+      } catch (error) {
+        errorBox.textContent = 'Something went wrong. Please try again.';
+        submitButton.disabled = false;
+        submitButton.textContent = 'Confirm Booking';
+      }
+    });
+  </script>
+</body>
+</html>
