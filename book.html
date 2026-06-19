@@ -1,148 +1,177 @@
-      booking.querySelectorAll(".herbag-secondary-btn").forEach(function (btn) {
-        btn.addEventListener("click", function () {
-          herbagGoToStep(btn.dataset.back);
-        });
-      });
-      if (dateInput) {
-        dateInput.min = formatLocalDate(new Date());
-        dateInput.addEventListener("click", function () {
-          if (dateInput.showPicker) dateInput.showPicker();
-        });
-        dateInput.addEventListener("change", async function () {
-          const todayValue = formatLocalDate(new Date());
-          if (this.value < todayValue) {
-            alert("Please select today or a future date.");
-            this.value = "";
-            clearTimeSelection();
-            if (timeScroll) {
-              timeScroll.querySelectorAll("button").forEach(function (button) {
-                button.classList.remove("booked");
-                button.classList.remove("past");
-                button.disabled = false;
-              });
-            }
-            validateStep2();
-            return;
-          }
-          if (getDayFromDateValue(this.value) === 0) {
-            alert("Sunday is closed. Please select another date.");
-            this.value = "";
-            clearTimeSelection();
-            if (timeScroll) {
-              timeScroll.querySelectorAll("button").forEach(function (button) {
-                button.classList.remove("booked");
-                button.classList.remove("past");
-                button.disabled = false;
-              });
-            }
-            validateStep2();
-            return;
-          }
-          clearTimeSelection();
-          if (timeScroll) {
-            timeScroll.querySelectorAll("button").forEach(function (button) {
-              button.classList.remove("booked");
-              button.classList.remove("past");
-              button.disabled = false;
-            });
-          }
-          await loadBookedSlots(this.value);
-          updatePastTimeSlots();
-          validateStep2();
-        });
+<style>
+.herbag-booking-elegant *{
+  box-sizing:border-box;
+}
+.herbag-booking-elegant{
+  max-width:720px;
+  margin:0 auto;
+  padding:40px 20px;
+}
+.herbag-time-scroll{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  margin:24px 0;
+}
+.herbag-time-scroll button{
+  width:142px;
+  height:56px;
+  border:1px solid #000;
+  background:#fff;
+  cursor:pointer;
+}
+.herbag-time-scroll button.past{
+  display:none!important;
+}
+.herbag-main-btn{
+  width:100%;
+  height:60px;
+  background:#000;
+  color:#fff;
+  border:none;
+  cursor:pointer;
+}
+.herbag-confirmation-box{
+  text-align:center;
+  padding:48px 24px;
+}
+.herbag-confirmation-icon{
+  font-size:42px;
+  margin-bottom:18px;
+}
+</style>
+
+<div class="herbag-booking-elegant">
+
+<form id="herbagForm">
+
+<input type="date" id="herbagDate" required>
+
+<div class="herbag-time-scroll" id="timeScroll">
+  <button type="button">09:00</button>
+  <button type="button">10:00</button>
+  <button type="button">11:00</button>
+  <button type="button">12:00</button>
+  <button type="button">13:00</button>
+  <button type="button">14:00</button>
+  <button type="button">15:00</button>
+  <button type="button">16:00</button>
+  <button type="button">17:00</button>
+</div>
+
+<input type="text" name="name" placeholder="Full Name" required>
+<input type="email" name="email" placeholder="Email" required>
+<input type="tel" name="phone" placeholder="Phone" required>
+
+<button type="submit" class="herbag-main-btn">
+  <span>Book Appointment</span>
+</button>
+
+</form>
+
+<div id="herbagStep3"></div>
+
+</div>
+
+<script>
+(function(){
+
+const dateInput=document.getElementById("herbagDate");
+const timeScroll=document.getElementById("timeScroll");
+const form=document.getElementById("herbagForm");
+
+let selectedTime="";
+
+function formatLocalDate(date){
+  const y=date.getFullYear();
+  const m=String(date.getMonth()+1).padStart(2,"0");
+  const d=String(date.getDate()).padStart(2,"0");
+  return y+"-"+m+"-"+d;
+}
+
+function isPastTimeSlot(dateValue,timeValue){
+  if(!dateValue||!timeValue) return false;
+  const now=new Date();
+  const selected=new Date(dateValue+"T"+timeValue);
+  return selected<now;
+}
+
+function updatePastTimeSlots(){
+  const today=formatLocalDate(new Date());
+
+  timeScroll.querySelectorAll("button").forEach(function(btn){
+
+    btn.classList.remove("past");
+
+    if(dateInput.value===today){
+
+      const time=btn.innerText.trim();
+      const selected=new Date(today+"T"+time);
+
+      if(selected<new Date()){
+        btn.classList.add("past");
       }
-      function generateBookingCode() {
-        const now = new Date();
-        const datePart =
-          String(now.getFullYear()).slice(2) +
-          String(now.getMonth() + 1).padStart(2, "0") +
-          String(now.getDate()).padStart(2, "0") +
-          String(now.getHours()).padStart(2, "0") +
-          String(now.getMinutes()).padStart(2, "0");
-        const randomPart = Math.random().toString(36).substring(2, 6).toUpperCase();
-        return "HB" + datePart + randomPart;
-      }
-      if (form) {
-        form.addEventListener("submit", async function (event) {
-          event.preventDefault();
-          const submitBtn = form.querySelector('button[type="submit"]');
-          const fullName = form.name.value.trim();
-          const nameParts = fullName.split(" ");
-          const firstName = nameParts[0] || "";
-          const lastName = nameParts.slice(1).join(" ") || "-";
-          const code = generateBookingCode();
-          updatePastTimeSlots();
-          if (isPastTimeSlot(dateInput.value, timeInput.value)) {
-            messageBox.innerHTML = "Please select a future time.";
-            clearTimeSelection();
-            updatePastTimeSlots();
-            validateStep2();
-            return;
-          }
-          const data = {
-            first_name: firstName,
-            last_name: lastName,
-            email: form.email.value,
-            phone: form.phone.value,
-            notes: form.message.value,
-            selected_date: dateInput.value,
-            selected_time: timeInput.value,
-            product: herbagSelectedService,
-            product_url: window.location.href,
-            product_image: "",
-            product_description: "Appointment service: " + herbagSelectedService,
-            confirmation_code: code
-          };
-          submitBtn.disabled = true;
-          submitBtn.querySelector("span").innerText = "Sending...";
-          messageBox.innerHTML = "";
-          try {
-            const response = await fetch("https://project-ghud3.vercel.app/api/create-booking", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json"
-              },
-              body: JSON.stringify(data)
-            });
-            if (!response.ok) {
-              throw new Error(await response.text());
-            }
-            booking.querySelector("#herbagStep3").innerHTML = `
-              <div class="herbag-confirmation-box">
-                <div class="herbag-confirmation-icon">✓</div>
-                <h3 class="h3">Appointment Request Received</h3>
-                <div class="herbag-confirmation-code">${code}</div>
-                <p>Thank you ${firstName}, your appointment request has been received.</p>
-                <div>${herbagSelectedService} · ${dateInput.value} · ${timeInput.value}</div>
-              </div>
-            `;
-            herbagGoToStep(3);
-          } catch (error) {
-            console.error(error);
-            messageBox.innerHTML = "Something went wrong. Please try again.";
-            submitBtn.disabled = false;
-            submitBtn.querySelector("span").innerText = "Book Appointment";
-          }
-        });
-      }
-      setInterval(function () {
-        updatePastTimeSlots();
-      }, 60000);
-      validateStep2();
-    });
-  }
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", function () {
-      initHerbagBookingForms(document);
-    });
-  } else {
-    initHerbagBookingForms(document);
-  }
-  document.addEventListener("shopify:section:load", function (event) {
-    initHerbagBookingForms(event.target);
+
+    }
+
   });
+}
+
+dateInput.min=formatLocalDate(new Date());
+
+dateInput.addEventListener("change",function(){
+
+  updatePastTimeSlots();
+
+});
+
+timeScroll.querySelectorAll("button").forEach(function(btn){
+
+  btn.addEventListener("click",function(){
+
+    selectedTime=btn.innerText.trim();
+
+    timeScroll.querySelectorAll("button").forEach(function(b){
+      b.style.background="#fff";
+      b.style.color="#000";
+    });
+
+    btn.style.background="#000";
+    btn.style.color="#fff";
+
+  });
+
+});
+
+form.addEventListener("submit",function(e){
+
+  e.preventDefault();
+
+  if(isPastTimeSlot(dateInput.value,selectedTime)){
+    alert("Please select a future time.");
+    return;
+  }
+
+  const name=form.name.value;
+
+  document.getElementById("herbagStep3").innerHTML=`
+    <div class="herbag-confirmation-box">
+      <div class="herbag-confirmation-icon">✓</div>
+      <h3>Appointment Request Received</h3>
+      <p>Thank you ${name}, your appointment request has been received.</p>
+      <div>${dateInput.value} · ${selectedTime}</div>
+    </div>
+  `;
+
+  form.style.display="none";
+
+});
+
+updatePastTimeSlots();
+
+setInterval(function(){
+  updatePastTimeSlots();
+},60000);
+
 })();
 </script>
-</main>
-</body>
-</html>
